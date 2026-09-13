@@ -54,6 +54,15 @@ whichever fits your stack:
   identical detect → enrich → score → ticket logic, runnable via
   [`cli.py`](cli.py) or importable into your own service.
 
+...plus a **[`dashboard/`](dashboard/)** — an animated React + TypeScript
+console that visualizes either one running. Click a queued alert and watch it
+move through the pipeline: nodes lighting up, a risk gauge counting up,
+enrichment cards animating in, and a Jira ticket (or "logged only") outcome
+at the end. Demo mode needs no backend at all — every number is precomputed
+with the same scoring rubric as `scoring.py` — or point it at the optional
+[`api/`](api/main.py) FastAPI wrapper to animate the real pipeline's output
+instead.
+
 ## Quick start
 
 ### Option A: Python pipeline
