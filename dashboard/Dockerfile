@@ -1,14 +1,17 @@
 # --- Build stage -------------------------------------------------------
 # Debian-based (glibc), not Alpine: Vite 8's bundler (Rolldown) ships
-# platform-specific native binaries, and npm's optional-dependency
-# resolution has a long-standing bug (npm/cli#4828) that bites musl/Alpine
-# targets in particular. The runtime stage below is still Alpine -- it never
-# gets node_modules, just the static dist/ output.
+# platform-specific native binaries, and `npm ci` against a lockfile
+# resolved on a different machine hits npm's long-standing optional-
+# dependency bug (npm/cli#4828) -- it can't find its own native binding.
+# `npm install` (not `npm ci`) re-resolves optional deps fresh for
+# whatever platform is actually building the image, which is npm's own
+# documented workaround. The runtime stage below is still Alpine -- it
+# never gets node_modules, just the static dist/ output.
 FROM node:20.18-bookworm-slim AS build
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY package.json ./
+RUN npm install
 
 COPY . .
 RUN npm run build
