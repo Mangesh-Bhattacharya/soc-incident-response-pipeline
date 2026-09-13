@@ -1,0 +1,14 @@
+{
+  "rule_name": "Suspicious Outbound Connection Following Malicious File Write",
+  "search_name": "SOC - Malware Drop + C2 Beacon Correlation",
+  "_time": "2026-09-12T03:41:07Z",
+  "host": "WKS-FIN-0231",
+  "user": "j.alvarez",
+  "src_ip": "185.220.101.45",
+  "dest_ip": "10.12.4.18",
+  "file_hash": "275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0",
+  "file_path": "C:\\Users\\j.alvarez\\AppData\\Local\\Temp\\update_svc.exe",
+  "process_name": "update_svc.exe",
+  "sourcetype": "WinEventLog:Sysmon",
+  "index": "endpoint"
+}

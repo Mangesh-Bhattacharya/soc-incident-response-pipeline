@@ -1,0 +1,52 @@
+-- SOC detection searches — Splunk SPL
+-- Each search is meant to be saved as a scheduled alert whose trigger action
+-- is the webhook described in alert_webhook_setup.md. Field names in the
+-- output (rule_name, host, user, src_ip, file_hash, _time) match what
+-- socpipeline.pipeline.process_alert() and the n8n workflow both expect.
+
+-- ---------------------------------------------------------------------------
+-- 1) Malicious file write + outbound beacon correlation (endpoint + network)
+--    Flags a process writing a new file to disk (Sysmon EventCode=11) that is
+--    followed within 5 minutes by that same host making an outbound
+--    connection (Sysmon EventCode=3) to an IP outside the corporate CIDR.
+-- ---------------------------------------------------------------------------
+index=endpoint sourcetype="WinEventLog:Sysmon" EventCode=11
+| rename Computer AS host, TargetFilename AS file_path, Hashes AS raw_hashes, User AS user
+| rex field=raw_hashes "SHA256=(?<file_hash>[A-Fa-f0-9]{64})"
+| eval rule_name="Suspicious File Write"
+| join type=inner host
+    [ search index=endpoint sourcetype="WinEventLog:Sysmon" EventCode=3
+      | rename Computer AS host, DestinationIp AS dest_ip, SourceIp AS src_ip
+      | where NOT cidrmatch("10.0.0.0/8", dest_ip)
+      | fields host, src_ip, dest_ip, _time ]
+| table _time, host, user, file_path, file_hash, src_ip, dest_ip, rule_name
+| eval search_name="SOC - Malware Drop + C2 Beacon Correlation"
+
+
+-- ---------------------------------------------------------------------------
+-- 2) Brute-force / credential-stuffing detection
+--    5+ failed authentications for the same account from the same source IP
+--    inside a 10-minute window, followed by no successful login in that
+--    window (a filter to cut noise from users who just mistyped a password
+--    once and then got in).
+-- ---------------------------------------------------------------------------
+index=auth sourcetype="linux_secure" OR sourcetype="WinEventLog:Security" (action=failure OR EventCode=4625)
+| rename src_ip AS src_ip, user AS user, dest AS host
+| bin _time span=10m
+| stats count AS failed_attempts, values(host) AS host by src_ip, user, _time
+| where failed_attempts >= 5
+| eval rule_name="Brute Force Authentication Attempt", search_name="SOC - Repeated Auth Failures"
+| table _time, host, user, src_ip, failed_attempts, rule_name, search_name
+
+
+-- ---------------------------------------------------------------------------
+-- 3) Outbound connection to a known-bad IP watchlist
+--    Joins live network traffic against a lookup table (threat_ip_watchlist.csv)
+--    you maintain, or replace with a `| inputlookup` against a threat-intel feed.
+-- ---------------------------------------------------------------------------
+index=network sourcetype="firewall" action=allowed
+| rename src AS host, src_ip AS src_ip, dest_ip AS dest_ip, dest_port AS dest_port
+| lookup threat_ip_watchlist.csv ip AS dest_ip OUTPUT is_known_bad
+| where is_known_bad=1
+| eval rule_name="Outbound Connection to Watchlisted IP", search_name="SOC - Watchlist IP Egress"
+| table _time, host, src_ip, dest_ip, dest_port, rule_name, search_name

@@ -1,0 +1,299 @@
+{
+  "name": "SOC Incident Triage Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "splunk-alert",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "49c2afb3-9d3f-4295-888f-253c90da15bf",
+      "name": "Splunk Alert Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        400
+      ],
+      "webhookId": "0a89a220-b42c-4c8f-a500-ea2225c06af6"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const items = $input.all();\nreturn items.map(item => {\n  const body = item.json.body || item.json;\n  const raw = body.result || (Array.isArray(body.results) ? body.results[0] : body) || {};\n  return {\n    json: {\n      rule_name: raw.rule_name || body.search_name || 'Unknown Rule',\n      search_name: body.search_name || raw.search_name || '',\n      host: raw.host || '',\n      user: raw.user || '',\n      src_ip: raw.src_ip || '',\n      file_hash: raw.file_hash || '',\n      _time: raw._time || new Date().toISOString()\n    }\n  };\n});"
+      },
+      "id": "7d6713b2-1593-4b1a-8dd0-69f6eefcf2d4",
+      "name": "Normalize Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://www.virustotal.com/api/v3/files/{{$json.file_hash}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "103210f7-3c3b-4d88-abbf-16242d6db69c",
+      "name": "VirusTotal Lookup",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        680,
+        400
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "1",
+          "name": "VirusTotal API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.abuseipdb.com/api/v2/check",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "ipAddress",
+              "value": "={{$('Normalize Alert').item.json.src_ip}}"
+            },
+            {
+              "name": "maxAgeInDays",
+              "value": "90"
+            }
+          ]
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "d9cd60d8-7785-4baf-a46e-3bcf80e00fe9",
+      "name": "AbuseIPDB Lookup",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        400
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2",
+          "name": "AbuseIPDB API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const alert = $('Normalize Alert').first().json;\nconst vt = $json;\nconst abuse = $json;\n\n// VT and AbuseIPDB responses were both flattened onto $json by the preceding\n// HTTP Request nodes in this linear chain, so re-read each via its node name\n// to avoid ambiguity.\nconst vtJson = $('VirusTotal Lookup').first().json || {};\nconst abuseJson = $('AbuseIPDB Lookup').first().json || {};\n\nconst vtStats = (vtJson.data && vtJson.data.attributes && vtJson.data.attributes.last_analysis_stats) || {};\nconst malicious = vtStats.malicious || 0;\nconst suspicious = vtStats.suspicious || 0;\nconst totalEngines = malicious + suspicious + (vtStats.harmless || 0) + (vtStats.undetected || 0);\n\nconst abuseData = abuseJson.data || {};\nconst abuseScore = typeof abuseData.abuseConfidenceScore === 'number' ? abuseData.abuseConfidenceScore : 0;\nconst isTor = !!abuseData.isTor;\nconst totalReports = abuseData.totalReports || 0;\n\nlet score = 0;\nconst reasons = [];\n\nconst maliciousPoints = Math.min(malicious * 6, 60);\nconst suspiciousPoints = Math.min(suspicious * 2, 10);\nif (maliciousPoints) {\n  score += maliciousPoints;\n  reasons.push(`VirusTotal: ${malicious}/${totalEngines} engines flagged ${alert.file_hash} as malicious`);\n}\nif (suspiciousPoints) {\n  score += suspiciousPoints;\n  reasons.push(`VirusTotal: ${suspicious} engines flagged the hash as suspicious`);\n}\n\nconst abusePoints = Math.round(abuseScore * 0.5);\nif (abusePoints) {\n  score += abusePoints;\n  reasons.push(`AbuseIPDB: ${alert.src_ip} has a ${abuseScore}% abuse confidence score across ${totalReports} reports`);\n}\nif (isTor) {\n  score += 10;\n  reasons.push(`AbuseIPDB: ${alert.src_ip} is a known Tor exit node`);\n}\n\nscore = Math.min(score, 100);\nif (reasons.length === 0) {\n  reasons.push('No indicators returned a hit from either enrichment source');\n}\n\nlet severity = 'INFO';\nif (score >= 80) severity = 'CRITICAL';\nelse if (score >= 60) severity = 'HIGH';\nelse if (score >= 40) severity = 'MEDIUM';\nelse if (score > 0) severity = 'LOW';\n\nconst priorityMap = { CRITICAL: 'Highest', HIGH: 'High', MEDIUM: 'Medium', LOW: 'Low', INFO: 'Lowest' };\n\nreturn [{\n  json: {\n    ...alert,\n    score,\n    severity,\n    reasons,\n    should_create_ticket: score >= 40,\n    jira_priority: priorityMap[severity]\n  }\n}];"
+      },
+      "id": "1aefacc0-341f-44bd-b2e1-b966b3978375",
+      "name": "Score Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "c8cbf2d5-18e0-4e41-8db6-1b26b3cb130e",
+              "leftValue": "={{$json.should_create_ticket}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a5fdb5ef-dcc4-4c21-a521-4554b564e02e",
+      "name": "Should Create Ticket?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const item = $json;\nconst summary = `[${item.severity}] ${item.rule_name} — ${item.host || 'unknown host'}`;\nconst descriptionLines = [\n  `Detected by rule: ${item.rule_name}`,\n  `Host: ${item.host || 'unknown'}   User: ${item.user || 'unknown'}`,\n  `Risk score: ${item.score}/100 (${item.severity})`,\n  ...item.reasons,\n  `Raw alert time: ${item._time}`\n];\n\nreturn [{\n  json: {\n    fields: {\n      project: { key: $env.JIRA_PROJECT_KEY || 'SOC' },\n      summary,\n      description: {\n        type: 'doc',\n        version: 1,\n        content: descriptionLines.map(line => ({\n          type: 'paragraph',\n          content: [{ type: 'text', text: line }]\n        }))\n      },\n      issuetype: { name: 'Incident' },\n      priority: { name: item.jira_priority },\n      labels: ['soc-automation']\n    }\n  }\n}];"
+      },
+      "id": "6873dac8-4599-4c24-bd85-68fa716b1d44",
+      "name": "Build Jira Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1560,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.JIRA_BASE_URL}}/rest/api/3/issue",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {}
+      },
+      "id": "8e0d7487-d3d2-44b8-9665-2d947bbefe8c",
+      "name": "Create Jira Ticket",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1780,
+        300
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "3",
+          "name": "Jira Cloud API"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "2b2d60d9-b0f7-40b7-9183-cd638a96612a",
+      "name": "Below Threshold - Log Only",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        500
+      ]
+    }
+  ],
+  "connections": {
+    "Splunk Alert Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Alert": {
+      "main": [
+        [
+          {
+            "node": "VirusTotal Lookup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VirusTotal Lookup": {
+      "main": [
+        [
+          {
+            "node": "AbuseIPDB Lookup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AbuseIPDB Lookup": {
+      "main": [
+        [
+          {
+            "node": "Score Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score Alert": {
+      "main": [
+        [
+          {
+            "node": "Should Create Ticket?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Create Ticket?": {
+      "main": [
+        [
+          {
+            "node": "Build Jira Payload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Below Threshold - Log Only",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Jira Payload": {
+      "main": [
+        [
+          {
+            "node": "Create Jira Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}
