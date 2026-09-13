@@ -65,7 +65,20 @@ instead.
 
 ## Quick start
 
-### Option A: Python pipeline
+### Option A: Docker (recommended — works the same on Linux, macOS, Windows)
+
+```bash
+cp .env.example .env      # fill in VT_API_KEY / ABUSEIPDB_API_KEY / JIRA_* — or leave blank for demo mode
+docker compose up --build
+```
+
+Open **http://localhost:8080** — the animated dashboard, wired live to the
+real Python pipeline behind an nginx reverse proxy, no Python/Node.js
+install needed on the host. Bound to `127.0.0.1` by default, so this doesn't
+need a firewall exception on any OS; see [`docs/docker.md`](docs/docker.md)
+for the full security rationale and how to opt into LAN access.
+
+### Option B: Python pipeline
 
 ```bash
 pip install -r requirements-dev.txt
@@ -86,7 +99,7 @@ Run the test suite (fully mocked — no API keys or network access required):
 pytest tests/ -v
 ```
 
-### Option B: n8n workflow
+### Option C: n8n workflow
 
 1. Import [`n8n/soc_triage_workflow.json`](n8n/soc_triage_workflow.json) into n8n.
 2. Wire up the VirusTotal / AbuseIPDB / Jira credentials.
@@ -120,22 +133,31 @@ Field-level mapping into the actual Jira ticket:
 ## Repository structure
 
 ```
-splunk/            SPL detection searches + Splunk webhook alert action setup
-n8n/                Importable n8n workflow (the no-code path)
-src/socpipeline/    Python package (the code path): VT + AbuseIPDB clients,
-                    scoring, Jira ticket creation, pipeline orchestration
-jira/               Ticket field mapping / template reference
-examples/           Sample Splunk alert payload used by the CLI, tests, and docs
-tests/              Pytest suite — every external API call is mocked
-docs/               Architecture diagram and design notes
-cli.py              Run the Python pipeline against an alert JSON file
+docker-compose.yml   One-command Docker deployment (dashboard + API, reverse-proxied)
+splunk/              SPL detection searches + Splunk webhook alert action setup
+n8n/                 Importable n8n workflow (the no-code path)
+src/socpipeline/     Python package (the code path): VT + AbuseIPDB clients,
+                     scoring, Jira ticket creation, pipeline orchestration
+api/                 FastAPI wrapper around socpipeline (used by the dashboard/Docker setup)
+dashboard/           React + TypeScript animated console, and its own Dockerfile
+jira/                Ticket field mapping / template reference
+examples/            Sample Splunk alert payload used by the CLI, tests, and docs
+tests/               Pytest suite — every external API call is mocked
+docs/                Architecture diagram, design notes, and the Docker security writeup
+cli.py               Run the Python pipeline against an alert JSON file
 ```
 
 ## Security notes
 
 - API keys live in environment variables (`.env`, gitignored) or n8n
   credentials — never hardcoded, never committed. `.env.example` documents
-  every variable the pipeline reads.
+  every variable the pipeline reads, and `.dockerignore` keeps `.env` out of
+  the Docker build context as a second line of defense.
+- The Docker deployment runs both containers as non-root with read-only root
+  filesystems, all Linux capabilities dropped, and the API container
+  unreachable from outside the compose network — see
+  [`docs/docker.md`](docs/docker.md) for the full rationale, including why
+  the default setup needs no firewall exception on Linux, macOS, or Windows.
 - The n8n webhook accepts unauthenticated POSTs by default — see the "Restrict
   who can reach the webhook" section in
   [`splunk/alert_webhook_setup.md`](splunk/alert_webhook_setup.md) before

@@ -1,0 +1,64 @@
+# Quick start:
+#   cp .env.example .env      # fill in API keys, or leave blank for demo mode
+#   docker compose up --build
+#   open http://localhost:8080
+#
+# See docs/docker.md for what's exposed, why, and how to open it up to your
+# LAN (including per-OS firewall commands) if you want that.
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    env_file:
+      - .env
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks:
+      - internal
+    # Deliberately no `ports:` here -- the API is reachable only from the
+    # dashboard container over the internal network, never from the host or
+    # LAN, regardless of any firewall rule.
+
+  dashboard:
+    build:
+      context: ./dashboard
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/cache/nginx
+      - /var/run
+      - /var/log/nginx
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      # Bound to localhost only: no firewall prompt on Windows/macOS/Linux
+      # for the default single-machine setup. Change to "8080:8080" (or add
+      # a docker-compose.override.yml) to expose it on your LAN -- see
+      # docs/docker.md for the firewall rule each OS needs in that case.
+      - "127.0.0.1:8080:8080"
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge

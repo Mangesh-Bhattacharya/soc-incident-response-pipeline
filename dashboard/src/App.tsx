@@ -8,7 +8,7 @@ import EnrichmentPanel from "./components/EnrichmentPanel";
 import TicketPanel from "./components/TicketPanel";
 import StatsStrip from "./components/StatsStrip";
 import { SCENARIOS } from "./data/scenarios";
-import { checkBackendHealth, hasLiveBackend, processAlertLive } from "./api";
+import { checkBackendHealth, processAlertLive } from "./api";
 import type { PipelineResult, Scenario, Stage } from "./types";
 import { STAGE_ORDER } from "./types";
 
@@ -35,9 +35,10 @@ export default function App() {
   const interactedRef = useRef(false);
 
   useEffect(() => {
-    if (hasLiveBackend) {
-      checkBackendHealth().then(setLive);
-    }
+    // Always probe -- in the Docker Compose deployment the API is reachable
+    // same-origin behind nginx with zero configuration, so this is how the
+    // dashboard discovers it rather than requiring an env var.
+    checkBackendHealth().then(setLive);
   }, []);
 
   useEffect(() => {

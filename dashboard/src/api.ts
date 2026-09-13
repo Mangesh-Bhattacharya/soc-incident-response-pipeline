@@ -1,11 +1,13 @@
 import type { PipelineResult, SplunkAlert } from "./types";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL as string | undefined;
-
-export const hasLiveBackend = Boolean(API_BASE);
+// Defaults to a same-origin relative path so this "just works" behind the
+// nginx reverse proxy in docker-compose.yml (which serves the dashboard and
+// proxies /api/* to the backend on the same origin -- no CORS, no second
+// port to open). Set VITE_API_BASE_URL to point at a different host, e.g.
+// when running `vite dev` against a backend on a different port.
+const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "";
 
 export async function checkBackendHealth(timeoutMs = 1500): Promise<boolean> {
-  if (!API_BASE) return false;
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -18,7 +20,6 @@ export async function checkBackendHealth(timeoutMs = 1500): Promise<boolean> {
 }
 
 export async function processAlertLive(alert: SplunkAlert): Promise<PipelineResult> {
-  if (!API_BASE) throw new Error("VITE_API_BASE_URL is not configured");
   const response = await fetch(`${API_BASE}/api/process`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

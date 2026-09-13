@@ -54,3 +54,49 @@ jobs:
 
       - name: Type-check and build
         run: npm run build
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create empty .env (demo mode -- no real keys needed to prove the stack boots)
+        run: cp .env.example .env
+
+      - name: Build and start the stack
+        run: docker compose -p soc-pipeline up --build -d
+
+      - name: Wait for both containers to report healthy
+        run: |
+          for i in $(seq 1 30); do
+            api_status=$(docker inspect -f '{{.State.Health.Status}}' soc-pipeline-api-1 2>/dev/null || echo "starting")
+            dash_status=$(docker inspect -f '{{.State.Health.Status}}' soc-pipeline-dashboard-1 2>/dev/null || echo "starting")
+            echo "api=$api_status dashboard=$dash_status"
+            if [ "$api_status" = "healthy" ] && [ "$dash_status" = "healthy" ]; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Containers never became healthy" >&2
+          docker compose -p soc-pipeline logs
+          exit 1
+
+      - name: Hit the dashboard and the proxied API through the published port
+        run: |
+          curl -sf http://localhost:8080/ | grep -qi "SOC Triage Console"
+          curl -sf http://localhost:8080/api/health | grep -Eq '"status":\s*"ok"'
+
+      - name: Confirm the API container publishes no host port
+        run: |
+          if docker port soc-pipeline-api-1 2>/dev/null | grep -q .; then
+            echo "API container should not publish any port to the host" >&2
+            exit 1
+          fi
+
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose -p soc-pipeline logs
+
+      - name: Tear down
+        if: always()
+        run: docker compose -p soc-pipeline down -v
