@@ -1,5 +1,10 @@
 # --- Build stage -------------------------------------------------------
-FROM node:20.18-alpine AS build
+# Debian-based (glibc), not Alpine: Vite 8's bundler (Rolldown) ships
+# platform-specific native binaries, and npm's optional-dependency
+# resolution has a long-standing bug (npm/cli#4828) that bites musl/Alpine
+# targets in particular. The runtime stage below is still Alpine -- it never
+# gets node_modules, just the static dist/ output.
+FROM node:20.18-bookworm-slim AS build
 WORKDIR /app
 
 COPY package.json package-lock.json ./
