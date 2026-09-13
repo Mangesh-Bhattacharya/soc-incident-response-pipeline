@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Header from "./components/Header";
+import Hero from "./components/Hero";
 import AlertQueue from "./components/AlertQueue";
 import PipelineFlow from "./components/PipelineFlow";
 import ScoreGauge from "./components/ScoreGauge";
@@ -29,7 +30,9 @@ export default function App() {
   const [result, setResult] = useState<PipelineResult | null>(null);
   const [live, setLive] = useState(false);
   const [history, setHistory] = useState<PipelineResult[]>([]);
+  const [autoPlaying, setAutoPlaying] = useState(false);
   const timers = useRef<number[]>([]);
+  const interactedRef = useRef(false);
 
   useEffect(() => {
     if (hasLiveBackend) {
@@ -40,6 +43,25 @@ export default function App() {
   useEffect(() => {
     return () => timers.current.forEach((t) => window.clearTimeout(t));
   }, []);
+
+  // First-time visitors from a blog link won't know to click anything —
+  // auto-play the most dramatic scenario shortly after load so the pipeline
+  // is already shown working. Cancelled the instant a real user interacts.
+  useEffect(() => {
+    const autoplayTimer = window.setTimeout(() => {
+      if (interactedRef.current) return;
+      setAutoPlaying(true);
+      runScenario(scenarios[0]).finally(() => setAutoPlaying(false));
+    }, 1600);
+    return () => window.clearTimeout(autoplayTimer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function handleRun(scenario: Scenario) {
+    interactedRef.current = true;
+    setAutoPlaying(false);
+    runScenario(scenario);
+  }
 
   async function runScenario(scenario: Scenario) {
     if (runningId) return;
@@ -95,12 +117,20 @@ export default function App() {
     ? history.reduce((worst, r) => (severityRank[r.score.severity] > severityRank[worst] ? r.score.severity : worst), "INFO")
     : "—";
 
+  const heroTarget = scenarios.find((s) => s.id === activeId) ?? scenarios[0];
+
   return (
     <div className="app-shell">
       <Header live={live} />
+      <Hero
+        onWatch={() => handleRun(heroTarget)}
+        hasRun={processed > 0}
+        isRunning={Boolean(runningId)}
+        autoPlaying={autoPlaying}
+      />
 
       <div className="layout-grid">
-        <AlertQueue scenarios={scenarios} activeId={activeId} runningId={runningId} onRun={runScenario} />
+        <AlertQueue scenarios={scenarios} activeId={activeId} runningId={runningId} onRun={handleRun} />
 
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <PipelineFlow stage={stage} />
@@ -147,13 +177,28 @@ export default function App() {
         highestSeverity={highestSeverity}
       />
 
-      <p className="footer-note">
-        Every number above follows the same scoring rules as{" "}
-        <a href="https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline" target="_blank" rel="noreferrer">
-          the real pipeline
+      <footer className="cta-footer">
+        <div>
+          <p className="cta-footer-title">Want this running against your own Splunk, Jira, and threat feeds?</p>
+          <p className="footer-note" style={{ margin: 0 }}>
+            Every number above follows the same scoring rules as{" "}
+            <a href="https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline" target="_blank" rel="noreferrer">
+              the real pipeline
+            </a>
+            {live
+              ? " — currently running against the live Python backend."
+              : ". Demo mode: canned scenarios, no backend required."}
+          </p>
+        </div>
+        <a
+          className="btn-primary"
+          href="https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Explore the repo →
         </a>
-        {live ? " — currently running against the live Python backend." : ". Demo mode: canned scenarios, no backend required."}
-      </p>
+      </footer>
     </div>
   );
 }

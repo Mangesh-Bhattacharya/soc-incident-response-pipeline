@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import type { CSSProperties } from "react";
 import type { Scenario, Severity } from "../types";
 import { SEVERITY_COLOR } from "../types";
 
@@ -30,6 +31,7 @@ export default function AlertQueue({ scenarios, activeId, runningId, onRun }: Al
             <motion.button
               key={scenario.id}
               className={`alert-item${activeId === scenario.id ? " active" : ""}`}
+              style={{ "--severity-color": SEVERITY_COLOR[severity] } as CSSProperties}
               onClick={() => onRun(scenario)}
               whileTap={{ scale: 0.98 }}
               disabled={runningId !== null}

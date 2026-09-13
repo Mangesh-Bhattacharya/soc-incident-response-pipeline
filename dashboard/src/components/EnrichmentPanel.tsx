@@ -60,6 +60,7 @@ export default function EnrichmentPanel({ virustotal, abuseipdb, showVt, showAbu
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
+            <span className="empty-icon">🦠</span>
             No file hash on this alert — VirusTotal skipped
           </motion.div>
         ) : null}
@@ -106,6 +107,7 @@ export default function EnrichmentPanel({ virustotal, abuseipdb, showVt, showAbu
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
+            <span className="empty-icon">🌐</span>
             No source IP on this alert — AbuseIPDB skipped
           </motion.div>
         ) : null}

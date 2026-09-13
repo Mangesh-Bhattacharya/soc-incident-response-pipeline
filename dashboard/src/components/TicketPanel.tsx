@@ -54,7 +54,10 @@ export default function TicketPanel({ ticket, score, visible }: TicketPanelProps
             </div>
           </motion.div>
         ) : (
-          <div className="empty-card">Run an alert through the pipeline to see the outcome</div>
+          <div className="empty-card">
+            <span className="empty-icon">🎫</span>
+            Run an alert through the pipeline to see the outcome
+          </div>
         )}
       </AnimatePresence>
     </div>
