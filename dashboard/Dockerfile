@@ -12,6 +12,10 @@ WORKDIR /app
 
 COPY package.json ./
 RUN npm install
+RUN echo "--- diagnostic: rolldown optional binding state ---" \
+    && node -p "process.platform + ' ' + process.arch" \
+    && (ls node_modules/@rolldown/ 2>&1 || echo "no @rolldown dir") \
+    && npm ls rolldown 2>&1 || true
 
 COPY . .
 RUN npm run build
