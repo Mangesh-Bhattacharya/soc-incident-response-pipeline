@@ -5,8 +5,30 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  schedule:
+    # Monthly even with zero commits -- catches drift from the outside
+    # world (an upstream API changing shape, a floating base image tag
+    # moving) that no diff in this repo would ever trigger a test run for.
+    - cron: "0 7 1 * *"
+  workflow_dispatch: {}
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Ruff
+        run: ruff check .
+
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -100,3 +122,32 @@ jobs:
       - name: Tear down
         if: always()
         run: docker compose -p soc-pipeline down -v
+
+  notify-on-scheduled-failure:
+    # Only the monthly cron run gets here for this -- a push/PR failure is
+    # already visible to whoever opened it. A scheduled run has nobody
+    # watching by default, so a silent failure is worse than a noisy one.
+    if: always() && github.event_name == 'schedule' && contains(needs.*.result, 'failure')
+    needs: [lint, test, dashboard, docker]
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Open or update a tracking issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh label create scheduled-ci-failure --repo "$REPO" --color d73a4a \
+            --description "Auto-filed by the monthly scheduled CI run" 2>/dev/null || true
+          existing=$(gh issue list --repo "$REPO" --label scheduled-ci-failure --state open --json number --jq '.[0].number')
+          body="The monthly scheduled CI run failed with nothing pushed to trigger it -- something outside this repo (an upstream package, a base image, an API) likely changed underneath it.
+
+          Run: $RUN_URL"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$REPO" --body "$body"
+          else
+            gh issue create --repo "$REPO" --title "Scheduled CI failed: $(date -u +%Y-%m-%d)" \
+              --label scheduled-ci-failure --body "$body"
+          fi

@@ -4,7 +4,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from socpipeline.abuseipdb import AbuseIPDBResult
-from socpipeline.scoring import Severity, TICKET_THRESHOLD_SCORE, score_alert
+from socpipeline.scoring import TICKET_THRESHOLD_SCORE, Severity, score_alert
 from socpipeline.virustotal import VirusTotalResult
 
 

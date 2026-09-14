@@ -190,6 +190,35 @@ docs/                Architecture diagram, design notes, and the Docker security
 cli.py               Run the Python pipeline against an alert JSON file
 ```
 
+## Reliability & maintenance
+
+No software is bug-free, and I won't claim this is — but here's what
+actually stands between a regression and `main`, and it runs without anyone
+having to remember to check:
+
+- **Dependabot** watches every dependency — Python, npm, both Docker base
+  images, the GitHub Actions themselves — and opens a PR the moment a
+  security patch or version bump lands. It doesn't wait for someone to
+  notice.
+- **CodeQL** scans the Python and TypeScript on every push, plus weekly on
+  its own — new vulnerability queries ship to CodeQL over time, so a
+  codebase that hasn't changed can still turn up a fresh finding.
+- **CI runs monthly even with zero commits** (`schedule:` in
+  [`ci.yml`](.github/workflows/ci.yml)), on top of every push and PR. This
+  is what catches drift *no diff in this repo would ever trigger a test
+  for* — an upstream API changing shape, a floating base image tag moving
+  underneath the Dockerfile. A scheduled run that fails automatically files
+  a tracking issue, because unlike a push, nobody's watching a cron job by
+  default.
+- **`ruff` gates every PR** for real correctness issues, not just style.
+- **19 tests, every external API call mocked**, run against Python 3.10,
+  3.11, and 3.12 — and the Docker job doesn't just check the Dockerfiles
+  parse, it boots the actual `docker compose` stack, waits for both
+  containers to report healthy, and curls it through the published port.
+
+All of it is free — GitHub's free tier for a public repo — and none of it
+needs a human to remember to run it.
+
 ## Security notes
 
 - API keys live in environment variables (`.env`, gitignored) or n8n

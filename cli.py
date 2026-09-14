@@ -14,7 +14,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-from socpipeline import process_alert  # noqa: E402
+from socpipeline import process_alert
 
 
 def main() -> int:

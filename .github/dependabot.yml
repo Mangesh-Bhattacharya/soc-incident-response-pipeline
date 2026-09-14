@@ -1,0 +1,37 @@
+version: 2
+updates:
+  # Python: requirements.txt, requirements-api.txt, requirements-dev.txt
+  # (Dependabot follows the -r includes automatically).
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels: ["dependencies", "python"]
+
+  - package-ecosystem: "npm"
+    directory: "/dashboard"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels: ["dependencies", "javascript"]
+
+  # Base images for both containers -- security patches land here often.
+  - package-ecosystem: "docker"
+    directory: "/api"
+    schedule:
+      interval: "weekly"
+    labels: ["dependencies", "docker"]
+
+  - package-ecosystem: "docker"
+    directory: "/dashboard"
+    schedule:
+      interval: "weekly"
+    labels: ["dependencies", "docker"]
+
+  # The GitHub Actions themselves (actions/checkout, setup-python, ...).
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels: ["dependencies", "ci"]
