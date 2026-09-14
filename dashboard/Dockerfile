@@ -1,21 +1,21 @@
 # --- Build stage -------------------------------------------------------
-# Debian-based (glibc), not Alpine: Vite 8's bundler (Rolldown) ships
-# platform-specific native binaries, and `npm ci` against a lockfile
-# resolved on a different machine hits npm's long-standing optional-
-# dependency bug (npm/cli#4828) -- it can't find its own native binding.
-# `npm install` (not `npm ci`) re-resolves optional deps fresh for
-# whatever platform is actually building the image, which is npm's own
-# documented workaround. The runtime stage below is still Alpine -- it
-# never gets node_modules, just the static dist/ output.
 FROM node:20.18-bookworm-slim AS build
 WORKDIR /app
 
 COPY package.json ./
 RUN npm install
-RUN echo "--- diagnostic: rolldown optional binding state ---" \
-    && node -p "process.platform + ' ' + process.arch" \
-    && (ls node_modules/@rolldown/ 2>&1 || echo "no @rolldown dir") \
-    && npm ls rolldown 2>&1 || true
+
+# Vite 8's bundler (Rolldown) ships its actual engine as a platform-specific
+# optional dependency (@rolldown/binding-<platform>). npm correctly detects
+# linux/x64 here but still doesn't install that package -- confirmed by
+# inspecting node_modules/@rolldown/ in this exact image, which comes up
+# empty of any binding package. That's npm's own documented optional-
+# dependency bug (npm/cli#4828), most likely a libc-detection gap in this
+# minimal Debian image causing npm to skip every libc-tagged optional
+# package rather than assume glibc. Installing the exact matching version
+# explicitly sidesteps whatever heuristic is failing.
+RUN ROLLDOWN_VERSION="$(node -p "require('./node_modules/rolldown/package.json').version")" \
+    && npm install --no-save "@rolldown/binding-linux-x64-gnu@${ROLLDOWN_VERSION}"
 
 COPY . .
 RUN npm run build
