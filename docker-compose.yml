@@ -41,11 +41,27 @@ services:
         condition: service_healthy
     restart: unless-stopped
     read_only: true
-    tmpfs:
-      - /tmp
-      - /var/cache/nginx
-      - /var/run
-      - /var/log/nginx
+    # Long-form tmpfs entries (not the short `tmpfs:` list) so each mount can
+    # be marked world-writable (mode 01777, like /tmp normally is) -- these
+    # default to root-owned otherwise, which the nginx-unprivileged image's
+    # uid-101 process can't write into, and nginx won't start without them.
+    volumes:
+      - type: tmpfs
+        target: /tmp
+        tmpfs:
+          mode: 01777
+      - type: tmpfs
+        target: /var/cache/nginx
+        tmpfs:
+          mode: 01777
+      - type: tmpfs
+        target: /var/run
+        tmpfs:
+          mode: 01777
+      - type: tmpfs
+        target: /var/log/nginx
+        tmpfs:
+          mode: 01777
     cap_drop:
       - ALL
     security_opt:
