@@ -23,7 +23,7 @@ RUN npm run build
 # --- Runtime stage -------------------------------------------------------
 # nginx-unprivileged: runs as a non-root user (uid 101) and listens on 8080
 # by default, so no extra USER/port juggling is needed here.
-FROM nginxinc/nginx-unprivileged:1.27-alpine
+FROM nginxinc/nginx-unprivileged:1.31-alpine
 
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
