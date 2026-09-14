@@ -13,7 +13,12 @@ export async function checkBackendHealth(timeoutMs = 1500): Promise<boolean> {
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     const response = await fetch(`${API_BASE}/api/health`, { signal: controller.signal });
     clearTimeout(timer);
-    return response.ok;
+    if (!response.ok) return false;
+    // Don't trust response.ok alone: `vite dev`'s SPA fallback serves
+    // index.html with a 200 for any unmatched route (including /api/health
+    // when no backend is running), which would otherwise read as "healthy".
+    const body = await response.json();
+    return body?.status === "ok";
   } catch {
     return false;
   }
