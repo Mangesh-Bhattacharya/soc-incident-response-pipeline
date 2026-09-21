@@ -1,48 +1,36 @@
-# SOC Incident Response & Threat Enrichment Pipeline 🛡️
+# SOC Incident Response and Threat Enrichment Pipeline 🛡️
 
 [![CI](https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline/actions/workflows/ci.yml)
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Docker](https://img.shields.io/badge/docker-one--command%20install-2496ED?logo=docker&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 
-**Detect → Enrich → Score → Ticket.** A SOC analyst's first ten minutes on
-every alert look the same: copy the file hash into VirusTotal, copy the
-source IP into AbuseIPDB, decide if it's worth escalating, then type up a
-Jira ticket if it is. This pipeline does that first pass automatically —
-Splunk detects, VirusTotal and AbuseIPDB enrich, a transparent scoring rubric
-decides severity, and only alerts that clear the bar get a ticket, evidence
-already attached.
+**Detect, enrich, score, ticket.** A SOC analyst's first ten minutes on every alert look the same: copy the file hash into VirusTotal, copy the source address into AbuseIPDB, decide whether it is worth escalating, then write a Jira ticket if it is. This pipeline does that first pass automatically. Splunk detects, VirusTotal and AbuseIPDB enrich, a transparent scoring rubric decides severity, and only alerts that clear the bar get a ticket with the evidence already attached.
 
-![SOC Triage Console — a CRITICAL alert scored 100/100 with the full pipeline shown running](docs/dashboard-preview.png)
+Severity is assigned by arithmetic you can read in one file, not by a model. [That is a deliberate choice](#why-the-scoring-layer-is-deterministic), and the reasoning matters more than the code.
 
-*The included [dashboard](#animated-dashboard) animating a real alert through
-the pipeline — a CRITICAL malware + C2 detection, VirusTotal and AbuseIPDB
-enrichment, and the resulting Jira ticket, end to end.*
+![SOC Triage Console showing a CRITICAL alert scored 100 out of 100 with the full pipeline running](docs/dashboard-preview.png)
+
+*The included [dashboard](#animated-dashboard) animating a real alert through the pipeline: a CRITICAL malware and C2 detection, VirusTotal and AbuseIPDB enrichment, and the resulting Jira ticket, end to end.*
 
 ## Try it in one command
 
 ```bash
 git clone https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline.git
 cd soc-incident-response-pipeline
-cp .env.example .env      # fill in VT_API_KEY / ABUSEIPDB_API_KEY / JIRA_* — or leave blank for demo mode
+cp .env.example .env      # fill in VT_API_KEY / ABUSEIPDB_API_KEY / JIRA_*, or leave blank for demo mode
 docker compose up --build
 ```
 
-Open **http://localhost:8080**. No Python or Node.js install on the host —
-the dashboard and API run in containers behind an nginx reverse proxy, bound
-to `127.0.0.1` by default so it needs no firewall exception on Linux, macOS,
-or Windows. See [`docs/docker.md`](docs/docker.md) for the security
-rationale and how to open it up to your LAN if you want that.
+Open **http://localhost:8080**. No Python or Node.js install on the host. The dashboard and API run in containers behind an nginx reverse proxy, bound to `127.0.0.1` by default so it needs no firewall exception on Linux, macOS, or Windows. See [`docs/docker.md`](docs/docker.md) for the security rationale and how to expose it to your LAN if you want that.
 
 Prefer to run it without Docker? See [Other ways to run this](#other-ways-to-run-this).
 
 ## Why this exists
 
-That first-pass triage work isn't hard, it's just repetitive and constant —
-exactly the kind of task that doesn't scale by hand past a handful of alerts
-a day, and exactly the kind automation is good at. Automating it doesn't
-replace an analyst's judgment; it clears the mechanical part away so the
-judgment call is the only thing left for a human to make.
+That first pass triage work is not hard, it is repetitive and constant, which is exactly the kind of task that does not scale by hand past a handful of alerts a day and exactly the kind automation is good at. Automating it does not replace an analyst's judgment. It clears the mechanical part away so the judgment call is the only thing left for a human to make.
+
+Decomposed, the first pass is five steps and only one of them needs a person. Extracting indicators is mechanical. Looking up hash reputation is mechanical. Looking up address reputation is mechanical. Writing the ticket with evidence at the right priority is mechanical. Deciding what it means is not. This automates the four.
 
 ## How it works
 
@@ -60,68 +48,108 @@ flowchart LR
 
 | Layer | Tool | Role |
 |---|---|---|
-| **Detect** | Splunk | Scheduled SPL searches flag suspicious activity (brute-force auth, malware file writes, C2 beaconing, watchlisted IPs) and fire a webhook alert action. |
-| **Orchestrate** | n8n *or* Python | Receives the alert, calls both enrichment APIs, scores it, and branches to ticket-creation or log-only. Two interchangeable implementations — see below. |
-| **Enrich (files)** | VirusTotal | Reputation lookup for file hashes — how many AV engines flag it malicious. |
-| **Enrich (network)** | AbuseIPDB | Reputation lookup for source IPs — abuse confidence score, Tor exit node status. |
+| **Detect** | Splunk | Scheduled SPL searches flag suspicious activity (brute force auth, malware file writes, C2 beaconing, watchlisted addresses) and fire a webhook alert action. |
+| **Orchestrate** | n8n *or* Python | Receives the alert, calls both enrichment APIs, scores it, and branches to ticket creation or log only. Two interchangeable implementations, see below. |
+| **Enrich (files)** | VirusTotal | Reputation lookup for file hashes, meaning how many engines flag it malicious. |
+| **Enrich (network)** | AbuseIPDB | Reputation lookup for source addresses: abuse confidence score, Tor exit node status. |
 | **Ticket** | Jira | Auto-creates a prioritized `Incident` issue, with the enrichment evidence already in the description, for anything that crosses the scoring threshold. |
 
 Full diagram and design notes: [`docs/architecture.md`](docs/architecture.md).
 
-## What's inside
-
-This repo ships **three interchangeable ways to run the same logic**, plus a
-dashboard that visualizes any of them:
-
-- **[`src/socpipeline/`](src/socpipeline/)** — a plain Python package (the
-  code path): VirusTotal/AbuseIPDB clients, the scoring engine, Jira ticket
-  creation, and orchestration. Runnable via [`cli.py`](cli.py) or importable
-  into your own service.
-- **[`n8n/soc_triage_workflow.json`](n8n/soc_triage_workflow.json)** — the
-  identical logic as an importable, no-code n8n workflow, for a SOC that
-  already runs n8n.
-- **[`api/`](api/main.py)** — a small FastAPI wrapper around the Python
-  package, used by the dashboard and the Docker deployment.
-- **[`docker-compose.yml`](docker-compose.yml)** — the one-command
-  deployment above: dashboard + API, hardened and reverse-proxied.
-
-### Animated dashboard
-
-**[`dashboard/`](dashboard/)** is a React + TypeScript console (a
-deliberately different stack from the Python backend) that visualizes the
-pipeline running. Click a queued alert — or just wait a couple of seconds,
-it plays one automatically — and watch it move stage by stage: pipeline
-nodes lighting up, a risk gauge counting up, enrichment cards animating in,
-and a Jira ticket (or "logged only") outcome at the end.
-
-It needs no backend to run: five scenarios spanning CRITICAL → INFO are
-precomputed with the *exact same scoring rubric* as [`scoring.py`](src/socpipeline/scoring.py),
-so nothing shown is invented. Point it at the FastAPI backend (which the
-Docker setup does automatically, same-origin, zero config) and it animates
-the real pipeline's output instead — always in dry-run mode, so the console
-itself can never file an actual Jira ticket.
-
 ## Scoring model
 
-Transparent and tunable rather than a black box — see
-[`scoring.py`](src/socpipeline/scoring.py):
+Transparent and tunable rather than a black box. See [`scoring.py`](src/socpipeline/scoring.py):
 
-- VirusTotal: +6 points per engine flagging **malicious** (capped at 60), +2
-  per **suspicious** (capped at 10).
-- AbuseIPDB: its 0–100 abuse-confidence score, weighted 50%; +10 flat if the
-  IP is a known Tor exit node.
+- VirusTotal: 6 points per engine flagging the hash **malicious** (capped at 60), 2 per **suspicious** (capped at 10).
+- AbuseIPDB: its 0 to 100 abuse confidence score, weighted 50 percent, plus 10 flat if the address is a known Tor exit node.
 - Combined score (capped at 100) maps to a severity:
 
   | Score | Severity | Jira priority | Ticket created? |
   |---|---|---|---|
-  | 80–100 | CRITICAL | Highest | ✅ |
-  | 60–79 | HIGH | High | ✅ |
-  | 40–59 | MEDIUM | Medium | ✅ |
-  | 1–39 | LOW | Low | ❌ (logged only) |
+  | 80 to 100 | CRITICAL | Highest | ✅ |
+  | 60 to 79 | HIGH | High | ✅ |
+  | 40 to 59 | MEDIUM | Medium | ✅ |
+  | 1 to 39 | LOW | Low | ❌ (logged only) |
   | 0 | INFO | Lowest | ❌ (logged only) |
 
-Field-level mapping into the actual Jira ticket:
-[`jira/ticket_template.md`](jira/ticket_template.md).
+Field level mapping into the actual Jira ticket: [`jira/ticket_template.md`](jira/ticket_template.md).
+
+### The suppression path is half the product
+
+![The console showing an alert scored 4 out of 100, classified LOW, with no ticket created and the reason recorded](docs/console-suppressed.png)
+
+A pipeline that only escalates has increased analyst load rather than reduced it. The value is as much in the alerts that never generate a ticket as in the ones that do, and an analyst's confidence in what the pipeline drops is what decides whether it survives contact with a real queue. That is also why the [fail open behaviour](#known-limitations) documented below matters more than any of the escalation logic.
+
+## Why the scoring layer is deterministic
+
+The obvious question in 2026 is why severity is assigned by roughly forty lines of arithmetic instead of a model. Three reasons, in increasing order of importance.
+
+**Reproducibility.** The same alert has to produce the same severity today and at a post incident review eight months from now. Sampling behaviour, context ordering, and model version drift all work against that, and pinning a version only defers the problem.
+
+**Auditability.** In a regulated environment somebody eventually asks why a given alert was classified the way it was. Six points per malicious engine verdict, capped at sixty, is an answer that survives an audit. A confidence score is a different kind of answer.
+
+**Input provenance.** Alert payloads contain attacker controlled strings. File paths, process names, command lines, parent process arguments, and hostnames are all partly or wholly chosen by whoever generated the activity. Routing those fields into a model that decides escalation creates a prompt injection surface at the exact point where the system decides whether a human ever sees the event. An attacker who can name a file gets a vote on whether anyone looks at the file, and a successful attempt produces no alert to investigate.
+
+None of this says models have no place in a SOC. Summarisation, correlation, and hunting hypotheses are all reasonable uses. The escalation gate is not. If you are building model driven triage, this repository is a reasonable baseline to measure against: keep the ingestion, enrichment, ticketing, and test harness, replace `scoring.py`, and you have a controlled comparison over identical inputs.
+
+## Known limitations
+
+Stated plainly, because finding these in week two is worse than reading them now. Each one is also a good contribution, see [Contributing](#contributing).
+
+**Enrichment failure is currently indistinguishable from a clean verdict.** Every failure path in the enrichment clients returns `found=False`, and `score_alert` gates on that flag without reading the accompanying `error` field. A rate limited lookup, a network timeout, a missing API key, and a genuinely unknown hash all contribute zero and all report `No indicators returned a hit from either enrichment source`:
+
+```
+Rate limited (HTTP 429)     score=  0  INFO  ticket=False
+Network timeout             score=  0  INFO  ticket=False
+API key missing             score=  0  INFO  ticket=False
+Genuinely unknown (404)     score=  0  INFO  ticket=False
+Known clean, 70 harmless    score=  0  INFO  ticket=False
+```
+
+This is a fail open control. Because there is no caching or backoff (see below), a burst of correlated alerts sharing one source address can exhaust the VirusTotal free tier quota, after which the remaining alerts are scored on no evidence and suppressed. An attacker does not need to evade the scoring model, only to exceed it. The fix is a distinct state rather than a score: an alert whose enrichment failed is not an alert that came back clean, and it belongs in a human queue.
+
+**The VirusTotal term saturates at ten engines.** `min(malicious * 6, 60)` reaches its cap at ten detections, so ten engines and seventy engines produce an identical 60 points. The bundled EICAR sample at 58 engines scores the same as a borderline packer false positive.
+
+**Scoring uses absolute detection counts, not ratios.** Ten of twelve engines and ten of seventy engines are the same number to the rubric, even though `total_engines()` is computed and available on the result object.
+
+**There is no behavioural axis.** Event count is discarded at normalisation, so forty failed logins and one failed login score identically. This is the real reason a brute force burst from a dirty Tor address lands at 54 (MEDIUM) rather than higher.
+
+**There is no enrichment caching, backoff, or retry.** Every alert triggers a fresh API call.
+
+**No containment actions.** Enrich, score, ticket. No host isolation, no account disable, no firewall changes, deliberately.
+
+**Enrichment sends indicators off site.** VirusTotal and AbuseIPDB are external services, so hashes and addresses leave your environment. For most organisations that is an accepted trade. For air gapped or classified deployments it is disqualifying, which is why the clients sit behind a narrow interface that a MISP or internal threat intelligence platform client can replace.
+
+**The n8n webhook accepts unauthenticated POSTs by default.** See the "Restrict who can reach the webhook" section in [`splunk/alert_webhook_setup.md`](splunk/alert_webhook_setup.md) before exposing it beyond a lab.
+
+## Contributing
+
+Issues and pull requests are welcome, and corrections are as welcome as features. Good places to start, roughly in order of value:
+
+1. **A calibration harness.** A labelled corpus of alerts plus a runner that reports a confusion matrix for a given weight set. This turns every argument about whether a score is correct from opinion into measurement, and it is what would let a model based scorer be compared against this rubric fairly.
+2. **An explicit `UNKNOWN` / enrichment failed state**, per the fail open limitation above. Roughly thirty lines and a correctness fix in a security control.
+3. **Ratio based VirusTotal scoring** using the denominator already on the result object, with a curve instead of a linear cap.
+4. **A behavioural scoring axis** carrying event count through from the Splunk payload.
+5. **Enrichment caching with backoff**, keyed on hash and address with a short time to live.
+6. **An additional ticketing backend.** `jira_client.py` is small and isolated, so ServiceNow or TheHive would each be contained.
+7. **Windows setup notes for the README.** `python -m venv` can produce an environment without a working pip, and `ensurepip` may fail to repair it, while installing against the system interpreter with `--user` works. Worth documenting.
+
+If you run this against real alert volume, the single most useful thing you can send is an alert that scored LOW and should have been CRITICAL, with the enrichment values that produced it.
+
+## What's inside
+
+This repo ships **three interchangeable ways to run the same logic**, plus a dashboard that visualizes any of them:
+
+- **[`src/socpipeline/`](src/socpipeline/)** is a plain Python package (the code path): VirusTotal and AbuseIPDB clients, the scoring engine, Jira ticket creation, and orchestration. Runnable via [`cli.py`](cli.py) or importable into your own service.
+- **[`n8n/soc_triage_workflow.json`](n8n/soc_triage_workflow.json)** is the identical logic as an importable, no code n8n workflow, for a SOC that already runs n8n.
+- **[`api/`](api/main.py)** is a small FastAPI wrapper around the Python package, used by the dashboard and the Docker deployment.
+- **[`docker-compose.yml`](docker-compose.yml)** is the one command deployment above: dashboard plus API, hardened and reverse proxied.
+
+### Animated dashboard
+
+**[`dashboard/`](dashboard/)** is a React and TypeScript console (a deliberately different stack from the Python backend) that visualizes the pipeline running. Click a queued alert, or just wait a couple of seconds since it plays one automatically, and watch it move stage by stage: pipeline nodes lighting up, a risk gauge counting up, enrichment cards animating in, and a Jira ticket or a "logged only" outcome at the end.
+
+It needs no backend to run. Five scenarios spanning CRITICAL to INFO are precomputed with the *exact same scoring rubric* as [`scoring.py`](src/socpipeline/scoring.py), so nothing shown is invented. Point it at the FastAPI backend, which the Docker setup does automatically, same origin, zero config, and it animates the real pipeline's output instead, always in dry run mode so the console itself can never file an actual Jira ticket.
 
 ## Other ways to run this
 
@@ -130,33 +158,32 @@ Field-level mapping into the actual Jira ticket:
 
 ```bash
 pip install -r requirements-dev.txt
-cp .env.example .env   # fill in VT_API_KEY, ABUSEIPDB_API_KEY, JIRA_* — or leave blank for --dry-run
+cp .env.example .env   # fill in VT_API_KEY, ABUSEIPDB_API_KEY, JIRA_*, or leave blank for --dry-run
 
 python cli.py --alert examples/sample_splunk_alert.json --dry-run
 ```
 
-The bundled sample alert uses the [EICAR test file hash](https://en.wikipedia.org/wiki/EICAR_test_file)
-(universally flagged malicious by every AV engine on VirusTotal, but
-harmless) and a known Tor exit-node IP range, so a real run against live
-VirusTotal/AbuseIPDB keys reliably scores `CRITICAL` and shows the full
-ticket-creation path without needing an actual malware sample.
+With no API keys configured this correctly returns `0/100 (INFO)`, because neither enrichment source returns data and no evidence accumulates. This is the most common point of confusion on a first run. See [Known limitations](#known-limitations) for why that output is currently identical to an enrichment failure.
 
-Run the test suite (fully mocked — no API keys or network access required):
+The bundled sample alert uses the [EICAR test file hash](https://en.wikipedia.org/wiki/EICAR_test_file), universally flagged malicious by every engine on VirusTotal but harmless, and a known Tor exit node address, so a real run against live keys reliably scores `CRITICAL` and shows the full ticket creation path without needing an actual malware sample.
+
+Run the test suite (fully mocked, no API keys or network access required):
 
 ```bash
 pytest tests/ -v
 ```
+
+Expected: `19 passed` in well under a second.
 </details>
 
 <details>
 <summary><strong>n8n workflow</strong></summary>
 
 1. Import [`n8n/soc_triage_workflow.json`](n8n/soc_triage_workflow.json) into n8n.
-2. Wire up the VirusTotal / AbuseIPDB / Jira credentials.
+2. Wire up the VirusTotal, AbuseIPDB, and Jira credentials.
 3. Point a Splunk alert's Webhook action at the workflow's production URL.
 
-Full steps: [`n8n/README.md`](n8n/README.md) and
-[`splunk/alert_webhook_setup.md`](splunk/alert_webhook_setup.md).
+Full steps: [`n8n/README.md`](n8n/README.md) and [`splunk/alert_webhook_setup.md`](splunk/alert_webhook_setup.md).
 </details>
 
 <details>
@@ -168,9 +195,7 @@ npm install
 npm run dev
 ```
 
-Opens at `http://localhost:5173` in demo mode. See
-[`dashboard/README.md`](dashboard/README.md) for live mode (pointing it at a
-locally-run `api/`) and a note on `npm install` inside cloud-synced folders.
+Opens at `http://localhost:5173` in demo mode. See [`dashboard/README.md`](dashboard/README.md) for live mode (pointing it at a locally run `api/`) and a note on `npm install` inside cloud synced folders.
 </details>
 
 ## Repository structure
@@ -185,57 +210,30 @@ api/                 FastAPI wrapper around socpipeline (used by the dashboard/D
 dashboard/           React + TypeScript animated console, and its own Dockerfile
 jira/                Ticket field mapping / template reference
 examples/            Sample Splunk alert payload used by the CLI, tests, and docs
-tests/               Pytest suite — every external API call is mocked
+tests/               Pytest suite, every external API call is mocked
 docs/                Architecture diagram, design notes, and the Docker security writeup
 cli.py               Run the Python pipeline against an alert JSON file
 ```
 
-## Reliability & maintenance
+## Reliability and maintenance
 
-No software is bug-free, and I won't claim this is — but here's what
-actually stands between a regression and `main`, and it runs without anyone
-having to remember to check:
+No software is bug free, and I will not claim this is. The [Known limitations](#known-limitations) section above is the honest list. Here is what stands between a regression and `main`, and it runs without anyone having to remember to check:
 
-- **Dependabot** watches every dependency — Python, npm, both Docker base
-  images, the GitHub Actions themselves — and opens a PR the moment a
-  security patch or version bump lands. It doesn't wait for someone to
-  notice.
-- **CodeQL** scans the Python and TypeScript on every push, plus weekly on
-  its own — new vulnerability queries ship to CodeQL over time, so a
-  codebase that hasn't changed can still turn up a fresh finding.
-- **CI runs monthly even with zero commits** (`schedule:` in
-  [`ci.yml`](.github/workflows/ci.yml)), on top of every push and PR. This
-  is what catches drift *no diff in this repo would ever trigger a test
-  for* — an upstream API changing shape, a floating base image tag moving
-  underneath the Dockerfile. A scheduled run that fails automatically files
-  a tracking issue, because unlike a push, nobody's watching a cron job by
-  default.
+- **Dependabot** watches every dependency (Python, npm, both Docker base images, and the GitHub Actions themselves) and opens a PR the moment a security patch or version bump lands.
+- **CodeQL** scans the Python and TypeScript on every push, plus weekly on its own. New vulnerability queries ship to CodeQL over time, so a codebase that has not changed can still turn up a fresh finding.
+- **CI runs monthly even with zero commits** (`schedule:` in [`ci.yml`](.github/workflows/ci.yml)), on top of every push and PR. This catches drift that no diff in this repo would ever trigger a test for, such as an upstream API changing shape or a floating base image tag moving underneath the Dockerfile. A scheduled run that fails automatically files a tracking issue, because unlike a push, nobody is watching a cron job by default.
 - **`ruff` gates every PR** for real correctness issues, not just style.
-- **19 tests, every external API call mocked**, run against Python 3.10,
-  3.11, and 3.12 — and the Docker job doesn't just check the Dockerfiles
-  parse, it boots the actual `docker compose` stack, waits for both
-  containers to report healthy, and curls it through the published port.
+- **19 tests, every external API call mocked**, run against Python 3.10, 3.11, and 3.12. The Docker job does not just check that the Dockerfiles parse, it boots the actual `docker compose` stack, waits for both containers to report healthy, and curls it through the published port.
 
-All of it is free — GitHub's free tier for a public repo — and none of it
-needs a human to remember to run it.
+All of it is free on GitHub's tier for public repos, and none of it needs a human to remember to run it.
 
 ## Security notes
 
-- API keys live in environment variables (`.env`, gitignored) or n8n
-  credentials — never hardcoded, never committed. `.env.example` documents
-  every variable the pipeline reads, and `.dockerignore` keeps `.env` out of
-  the Docker build context as a second line of defense.
-- The Docker deployment runs both containers as non-root with read-only root
-  filesystems, all Linux capabilities dropped, and the API container
-  unreachable from outside the compose network — see
-  [`docs/docker.md`](docs/docker.md) for the full rationale, including why
-  the default setup needs no firewall exception on Linux, macOS, or Windows.
-- The n8n webhook accepts unauthenticated POSTs by default — see the "Restrict
-  who can reach the webhook" section in
-  [`splunk/alert_webhook_setup.md`](splunk/alert_webhook_setup.md) before
-  exposing it beyond a lab environment.
-- The sample alert's file hash is the well-known EICAR test signature, not
-  live malware — safe to commit and safe to submit to VirusTotal.
+- API keys live in environment variables (`.env`, gitignored) or n8n credentials, never hardcoded and never committed. `.env.example` documents every variable the pipeline reads, and `.dockerignore` keeps `.env` out of the Docker build context as a second line of defense.
+- The Docker deployment runs both containers as non root with read only root filesystems, all Linux capabilities dropped, and the API container unreachable from outside the compose network. See [`docs/docker.md`](docs/docker.md) for the full rationale, including why the default setup needs no firewall exception on Linux, macOS, or Windows.
+- The n8n webhook accepts unauthenticated POSTs by default. See the "Restrict who can reach the webhook" section in [`splunk/alert_webhook_setup.md`](splunk/alert_webhook_setup.md) before exposing it beyond a lab environment.
+- The sample alert's file hash is the well known EICAR test signature, not live malware, so it is safe to commit and safe to submit to VirusTotal.
+- Enrichment currently fails open. See [Known limitations](#known-limitations) before relying on suppression decisions in production.
 
 ## License
 
