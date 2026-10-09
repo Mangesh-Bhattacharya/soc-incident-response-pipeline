@@ -44,3 +44,12 @@
 ## Publishing
 
 No Medium integration token is configured in this repository, so this is a draft file only. Paste it into Medium's editor or import it from a gist; Medium's own API for new posts is no longer issued to new applications, so check current availability before building automation on it.
+
+## Draft-only publishing script
+
+```bash
+python scripts/publish_medium_draft.py docs/blogs/<post>.md --dry-run       # inspect, no network
+MEDIUM_TOKEN=... python scripts/publish_medium_draft.py docs/blogs/<post>.md  # creates a DRAFT only
+```
+
+The token is read from the environment only and the script hard-codes `publishStatus: "draft"`, so a human always presses publish. Relative repo links are rewritten to GitHub URLs. Images are not uploaded; add them in the Medium editor.
