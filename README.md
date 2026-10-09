@@ -100,6 +100,14 @@ python cli.py --calibrate examples/calibration_corpus.json
 
 Scores a labelled corpus and prints a confusion matrix plus two ticket-level counts: **under-triaged** (should have reached an analyst, did not) and **over-triaged**. Under-triage is the number that matters. The bundled corpus is eleven synthetic cases labelled by the maintainer, so it encodes opinion rather than ground truth, and two cases are deliberate known gaps (the saturating VirusTotal term and the missing behavioural axis). Replace it with your own labelled alerts before tuning any weight. `evaluate()` in [`calibration.py`](src/socpipeline/calibration.py) accepts any scorer with `score_alert`'s signature, which is how a model-based scorer would be compared over identical inputs.
 
+### Sharing alerts safely
+
+```bash
+REDACT_SALT=$(openssl rand -hex 32) python cli.py --alert alert.json --json --redact
+```
+
+Pseudonymises users, hostnames, private IPs, and the profile directory in file paths with a keyed HMAC, so the same user gets the same token across a corpus but the token cannot be reversed without the salt. It is an allowlist: fields it does not recognise (command lines, URLs, registry values) are dropped, because they routinely carry credentials. Public IPs and file hashes are kept, since they are the indicators and already go to VirusTotal and AbuseIPDB. `--redact` implies `--dry-run`. Without `REDACT_SALT` it uses a random per-run salt. Check the output before posting it; this reduces exposure, it does not certify an alert as safe to publish. Source: [`redact.py`](src/socpipeline/redact.py).
+
 ## Known limitations
 
 Stated plainly, because finding these in week two is worse than reading them now. Each one is also a good contribution, see [Contributing](#contributing).
@@ -181,7 +189,7 @@ Run the test suite (fully mocked, no API keys or network access required):
 pytest tests/ -v
 ```
 
-Expected: `27 passed` in well under a second.
+Expected: `33 passed` in well under a second.
 </details>
 
 <details>
@@ -231,7 +239,7 @@ No software is bug free, and I will not claim this is. The [Known limitations](#
 - **CodeQL** scans the Python and TypeScript on every push, plus weekly on its own. New vulnerability queries ship to CodeQL over time, so a codebase that has not changed can still turn up a fresh finding.
 - **CI runs monthly even with zero commits** (`schedule:` in [`ci.yml`](.github/workflows/ci.yml)), on top of every push and PR. This catches drift that no diff in this repo would ever trigger a test for, such as an upstream API changing shape or a floating base image tag moving underneath the Dockerfile. A scheduled run that fails automatically files a tracking issue, because unlike a push, nobody is watching a cron job by default.
 - **`ruff` gates every PR** for real correctness issues, not just style.
-- **27 tests, every external API call mocked**, run against Python 3.10, 3.11, and 3.12. The Docker job does not just check that the Dockerfiles parse, it boots the actual `docker compose` stack, waits for both containers to report healthy, and curls it through the published port.
+- **33 tests, every external API call mocked**, run against Python 3.10, 3.11, and 3.12. The Docker job does not just check that the Dockerfiles parse, it boots the actual `docker compose` stack, waits for both containers to report healthy, and curls it through the published port.
 
 All of it is free on GitHub's tier for public repos, and none of it needs a human to remember to run it.
 
