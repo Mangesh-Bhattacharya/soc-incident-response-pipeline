@@ -2,7 +2,7 @@
 
 *Draft for Medium. Companion metadata, image prompts, and comment replies: [`2026-10-09-soc-incident-response-pipeline.meta.md`](2026-10-09-soc-incident-response-pipeline.meta.md).*
 
-![Hero: an analyst's alert queue feeding a shield-shaped gate that routes alerts to a ticket or a log](hero.png)
+<!-- hero.png: generate from the prompt in the .meta.md file, then upload to Medium -->
 
 ## TL;DR
 
@@ -74,11 +74,11 @@ The enrichment clients already separated "not found" (HTTP 404, `error=None`) fr
 
 ### This week's three commits
 
-| Branch | Commit | Why it helps |
-|---|---|---|
-| `fix/enrichment-fail-closed` | `fix: fail closed when enrichment errors instead of scoring as clean` | Removes the quota-exhaustion suppression path. The trade is queue flooding in place of silent loss, which is the safer failure. |
-| `feat/calibration-harness` | `feat: add calibration harness that scores a labelled corpus` | `python cli.py --calibrate corpus.json` prints a confusion matrix and counts **under-triaged** alerts, the metric that matters. Any scorer with `score_alert`'s signature can be evaluated, including a model-based one. |
-| `feat/alert-redaction` | `feat: add allowlist-based alert redaction for safe sharing` | `--redact` pseudonymises users, hosts, private IPs, and profile paths with a salted HMAC and drops unknown fields, so alerts can go into a public issue or shared corpus. |
+| Commit | Why it helps |
+|---|---|
+| `fix: fail closed when enrichment errors instead of scoring as clean` | Removes the quota-exhaustion suppression path. The trade is queue flooding in place of silent loss, which is the safer failure. |
+| `feat: add calibration harness that scores a labelled corpus` | `python cli.py --calibrate corpus.json` prints a confusion matrix and counts **under-triaged** alerts, the metric that matters. Any scorer with `score_alert`'s signature can be evaluated, including a model-based one. |
+| `feat: add allowlist-based alert redaction for safe sharing` | `--redact` pseudonymises users, hosts, private IPs, and profile paths with a salted HMAC and drops unknown fields, so alerts can go into a public issue or shared corpus. |
 
 ## Security considerations
 
