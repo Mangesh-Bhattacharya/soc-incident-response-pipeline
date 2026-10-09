@@ -112,3 +112,15 @@ def test_low_score_alert_skips_ticket():
     result = process_alert(alert)
     assert result["score"]["severity"] == "INFO"
     assert result["ticket"]["created"] is False
+
+
+def test_enrichment_outage_files_a_ticket_instead_of_suppressing(monkeypatch):
+    monkeypatch.delenv("VT_API_KEY", raising=False)
+    monkeypatch.delenv("ABUSEIPDB_API_KEY", raising=False)
+
+    result = process_alert(SAMPLE_ALERT, dry_run=True)
+
+    assert result["score"]["score"] == 0
+    assert result["score"]["enrichment_failed"] is True
+    assert result["ticket"]["dry_run"] is True
+    assert result["ticket"]["would_create"]["priority"] == "Medium"

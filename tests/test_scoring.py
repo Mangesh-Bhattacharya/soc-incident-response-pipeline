@@ -63,3 +63,31 @@ def test_ticket_threshold_boundary():
     result = score_alert(abuse_result=abuse)
     assert result.score == TICKET_THRESHOLD_SCORE
     assert result.should_create_ticket is True
+
+
+def test_enrichment_error_is_not_a_clean_verdict():
+    vt = VirusTotalResult(file_hash="abc123", found=False, error="VirusTotal returned HTTP 429")
+    result = score_alert(vt_result=vt)
+    assert result.score == 0
+    assert result.enrichment_failed is True
+    assert result.should_create_ticket is True
+    assert result.jira_priority == "Medium"
+    assert any("VirusTotal returned HTTP 429" in reason for reason in result.reasons)
+    assert not any("No indicators" in reason for reason in result.reasons)
+
+
+def test_not_found_without_error_stays_suppressed():
+    vt = VirusTotalResult(file_hash="abc123", found=False)  # HTTP 404: genuinely unknown
+    result = score_alert(vt_result=vt)
+    assert result.enrichment_failed is False
+    assert result.should_create_ticket is False
+
+
+def test_partial_failure_keeps_surviving_evidence_and_priority():
+    vt = VirusTotalResult(file_hash="abc123", found=False, error="timed out")
+    abuse = AbuseIPDBResult(ip_address="1.2.3.4", found=True, abuse_confidence_score=100, is_tor=True)
+    result = score_alert(vt_result=vt, abuse_result=abuse)
+    assert result.score == 60
+    assert result.severity == Severity.HIGH
+    assert result.jira_priority == "High"  # real evidence outranks the failure default
+    assert result.enrichment_failed is True

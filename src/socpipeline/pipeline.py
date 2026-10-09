@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from .abuseipdb import check_ip
 from .jira_client import create_incident_ticket
-from .scoring import JIRA_PRIORITY, score_alert
+from .scoring import score_alert
 from .virustotal import check_file_hash
 
 
@@ -42,7 +42,8 @@ def process_alert(alert: dict, dry_run: bool = False) -> dict:
         result["ticket"] = {"created": False, "reason": "Below ticket-creation threshold"}
         return result
 
-    summary = f"[{score.severity.value}] {alert.get('rule_name', 'SOC Alert')} — {alert.get('host', 'unknown host')}"
+    label = f"{score.severity.value}, ENRICHMENT FAILED" if score.enrichment_failed else score.severity.value
+    summary = f"[{label}] {alert.get('rule_name', 'SOC Alert')} — {alert.get('host', 'unknown host')}"
     description_lines = [
         f"Detected by rule: {alert.get('rule_name', 'unknown')}",
         f"Host: {alert.get('host', 'unknown')}   User: {alert.get('user', 'unknown')}",
@@ -50,7 +51,7 @@ def process_alert(alert: dict, dry_run: bool = False) -> dict:
         *score.reasons,
         f"Raw alert time: {alert.get('_time', 'unknown')}",
     ]
-    priority = JIRA_PRIORITY[score.severity.value]
+    priority = score.jira_priority
 
     if dry_run:
         result["ticket"] = {

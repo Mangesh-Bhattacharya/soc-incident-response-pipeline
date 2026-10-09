@@ -53,6 +53,8 @@ def main() -> int:
     print(f"Score:     {score['score']}/100  ({score['severity']})")
     for reason in score["reasons"]:
         print(f"  - {reason}")
+    if score.get("enrichment_failed"):
+        print("  ! Enrichment incomplete: treat the score as a lower bound, not a clean verdict", file=sys.stderr)
 
     ticket = result["ticket"]
     if ticket.get("created"):

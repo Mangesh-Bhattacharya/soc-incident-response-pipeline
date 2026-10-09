@@ -78,7 +78,7 @@ Field level mapping into the actual Jira ticket: [`jira/ticket_template.md`](jir
 
 ![The console showing an alert scored 4 out of 100, classified LOW, with no ticket created and the reason recorded](docs/console-suppressed.png)
 
-A pipeline that only escalates has increased analyst load rather than reduced it. The value is as much in the alerts that never generate a ticket as in the ones that do, and an analyst's confidence in what the pipeline drops is what decides whether it survives contact with a real queue. That is also why the [fail open behaviour](#known-limitations) documented below matters more than any of the escalation logic.
+A pipeline that only escalates has increased analyst load rather than reduced it. The value is as much in the alerts that never generate a ticket as in the ones that do, and an analyst's confidence in what the pipeline drops is what decides whether it survives contact with a real queue. That is also why the [enrichment failure behaviour](#known-limitations) documented below matters more than any of the escalation logic.
 
 ## Why the scoring layer is deterministic
 
@@ -96,17 +96,17 @@ None of this says models have no place in a SOC. Summarisation, correlation, and
 
 Stated plainly, because finding these in week two is worse than reading them now. Each one is also a good contribution, see [Contributing](#contributing).
 
-**Enrichment failure is currently indistinguishable from a clean verdict.** Every failure path in the enrichment clients returns `found=False`, and `score_alert` gates on that flag without reading the accompanying `error` field. A rate limited lookup, a network timeout, a missing API key, and a genuinely unknown hash all contribute zero and all report `No indicators returned a hit from either enrichment source`:
+**Enrichment failure fails closed, with a coarse priority.** A lookup that errors (HTTP 429, timeout, missing API key) is distinct from one that returns "not found". `score_alert` records it in `enrichment_errors`, and any alert with a failed lookup gets a ticket regardless of score, at `Medium` unless surviving evidence already scores higher. The reason line names which source failed. A genuine 404 from VirusTotal (hash never seen) still counts as a clean negative:
 
 ```
-Rate limited (HTTP 429)     score=  0  INFO  ticket=False
-Network timeout             score=  0  INFO  ticket=False
-API key missing             score=  0  INFO  ticket=False
+Rate limited (HTTP 429)     score=  0  INFO  ticket=True   priority=Medium
+Network timeout             score=  0  INFO  ticket=True   priority=Medium
+API key missing             score=  0  INFO  ticket=True   priority=Medium
 Genuinely unknown (404)     score=  0  INFO  ticket=False
 Known clean, 70 harmless    score=  0  INFO  ticket=False
 ```
 
-This is a fail open control. Because there is no caching or backoff (see below), a burst of correlated alerts sharing one source address can exhaust the VirusTotal free tier quota, after which the remaining alerts are scored on no evidence and suppressed. An attacker does not need to evade the scoring model, only to exceed it. The fix is a distinct state rather than a score: an alert whose enrichment failed is not an alert that came back clean, and it belongs in a human queue.
+The residual risk is the inverse: with no caching or backoff (see below), a burst of correlated alerts can exhaust the VirusTotal free tier and turn every later alert into a ticket. That floods the queue instead of silently dropping evidence, which is the safer failure, but it is still a failure. Caching and backoff are the fix.
 
 **The VirusTotal term saturates at ten engines.** `min(malicious * 6, 60)` reaches its cap at ten detections, so ten engines and seventy engines produce an identical 60 points. The bundled EICAR sample at 58 engines scores the same as a borderline packer false positive.
 
@@ -127,7 +127,7 @@ This is a fail open control. Because there is no caching or backoff (see below),
 Issues and pull requests are welcome, and corrections are as welcome as features. Good places to start, roughly in order of value:
 
 1. **A calibration harness.** A labelled corpus of alerts plus a runner that reports a confusion matrix for a given weight set. This turns every argument about whether a score is correct from opinion into measurement, and it is what would let a model based scorer be compared against this rubric fairly.
-2. **An explicit `UNKNOWN` / enrichment failed state**, per the fail open limitation above. Roughly thirty lines and a correctness fix in a security control.
+2. **Surfacing enrichment failure in the dashboard.** The API now returns `enrichment_failed` and `enrichment_errors`; the console does not render them yet.
 3. **Ratio based VirusTotal scoring** using the denominator already on the result object, with a curve instead of a linear cap.
 4. **A behavioural scoring axis** carrying event count through from the Splunk payload.
 5. **Enrichment caching with backoff**, keyed on hash and address with a short time to live.
@@ -163,7 +163,7 @@ cp .env.example .env   # fill in VT_API_KEY, ABUSEIPDB_API_KEY, JIRA_*, or leave
 python cli.py --alert examples/sample_splunk_alert.json --dry-run
 ```
 
-With no API keys configured this correctly returns `0/100 (INFO)`, because neither enrichment source returns data and no evidence accumulates. This is the most common point of confusion on a first run. See [Known limitations](#known-limitations) for why that output is currently identical to an enrichment failure.
+With no API keys configured this returns `0/100 (INFO)` with an "Enrichment incomplete" reason and a would-be `Medium` ticket, because a missing key is an enrichment failure, not a clean verdict. See [Known limitations](#known-limitations).
 
 The bundled sample alert uses the [EICAR test file hash](https://en.wikipedia.org/wiki/EICAR_test_file), universally flagged malicious by every engine on VirusTotal but harmless, and a known Tor exit node address, so a real run against live keys reliably scores `CRITICAL` and shows the full ticket creation path without needing an actual malware sample.
 
@@ -173,7 +173,7 @@ Run the test suite (fully mocked, no API keys or network access required):
 pytest tests/ -v
 ```
 
-Expected: `19 passed` in well under a second.
+Expected: `23 passed` in well under a second.
 </details>
 
 <details>
@@ -223,7 +223,7 @@ No software is bug free, and I will not claim this is. The [Known limitations](#
 - **CodeQL** scans the Python and TypeScript on every push, plus weekly on its own. New vulnerability queries ship to CodeQL over time, so a codebase that has not changed can still turn up a fresh finding.
 - **CI runs monthly even with zero commits** (`schedule:` in [`ci.yml`](.github/workflows/ci.yml)), on top of every push and PR. This catches drift that no diff in this repo would ever trigger a test for, such as an upstream API changing shape or a floating base image tag moving underneath the Dockerfile. A scheduled run that fails automatically files a tracking issue, because unlike a push, nobody is watching a cron job by default.
 - **`ruff` gates every PR** for real correctness issues, not just style.
-- **19 tests, every external API call mocked**, run against Python 3.10, 3.11, and 3.12. The Docker job does not just check that the Dockerfiles parse, it boots the actual `docker compose` stack, waits for both containers to report healthy, and curls it through the published port.
+- **23 tests, every external API call mocked**, run against Python 3.10, 3.11, and 3.12. The Docker job does not just check that the Dockerfiles parse, it boots the actual `docker compose` stack, waits for both containers to report healthy, and curls it through the published port.
 
 All of it is free on GitHub's tier for public repos, and none of it needs a human to remember to run it.
 
@@ -233,7 +233,7 @@ All of it is free on GitHub's tier for public repos, and none of it needs a huma
 - The Docker deployment runs both containers as non root with read only root filesystems, all Linux capabilities dropped, and the API container unreachable from outside the compose network. See [`docs/docker.md`](docs/docker.md) for the full rationale, including why the default setup needs no firewall exception on Linux, macOS, or Windows.
 - The n8n webhook accepts unauthenticated POSTs by default. See the "Restrict who can reach the webhook" section in [`splunk/alert_webhook_setup.md`](splunk/alert_webhook_setup.md) before exposing it beyond a lab environment.
 - The sample alert's file hash is the well known EICAR test signature, not live malware, so it is safe to commit and safe to submit to VirusTotal.
-- Enrichment currently fails open. See [Known limitations](#known-limitations) before relying on suppression decisions in production.
+- Enrichment failures fail closed (the alert is ticketed, not suppressed). Rate limit exhaustion therefore floods the queue rather than hiding alerts; see [Known limitations](#known-limitations).
 
 ## License
 
