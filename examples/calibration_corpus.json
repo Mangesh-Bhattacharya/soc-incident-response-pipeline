@@ -1,0 +1,30 @@
+{
+  "_comment": "Synthetic cases labelled by the maintainer's judgment of what an analyst should do. They encode opinion, not ground truth: replace them with your own labelled alerts before tuning anything. Cases marked 'known gap' are expected to misclassify under the current rubric.",
+  "cases": [
+    {"id": "eicar-tor-c2", "expected": "CRITICAL", "note": "Sample alert: 58-engine malware plus Tor C2",
+     "virustotal": {"malicious": 58, "suspicious": 0, "harmless": 0, "undetected": 10},
+     "abuseipdb": {"abuse_confidence_score": 100, "total_reports": 400, "is_tor": true}},
+    {"id": "known-malware-clean-ip", "expected": "HIGH", "note": "Widely detected hash, unremarkable source",
+     "virustotal": {"malicious": 40, "suspicious": 2, "harmless": 5, "undetected": 20},
+     "abuseipdb": {"abuse_confidence_score": 0, "total_reports": 0}},
+    {"id": "dirty-ip-only", "expected": "MEDIUM", "note": "Heavily reported address, no file indicator",
+     "abuseipdb": {"abuse_confidence_score": 85, "total_reports": 150}},
+    {"id": "brute-force-burst-tor", "expected": "HIGH", "note": "known gap: no behavioural axis, 40 failed logins from Tor scores 54",
+     "abuseipdb": {"abuse_confidence_score": 88, "total_reports": 300, "is_tor": true}},
+    {"id": "packer-false-positive", "expected": "LOW", "note": "known gap: 10 of 70 engines saturates the VT term and tickets as HIGH",
+     "virustotal": {"malicious": 10, "suspicious": 0, "harmless": 50, "undetected": 10}},
+    {"id": "single-engine-hit", "expected": "LOW",
+     "virustotal": {"malicious": 1, "suspicious": 0, "harmless": 60, "undetected": 9}},
+    {"id": "known-clean-hash", "expected": "INFO",
+     "virustotal": {"malicious": 0, "suspicious": 0, "harmless": 70, "undetected": 0},
+     "abuseipdb": {"abuse_confidence_score": 0, "total_reports": 0}},
+    {"id": "unknown-hash-404", "expected": "INFO",
+     "virustotal": {"found": false}},
+    {"id": "no-indicators", "expected": "INFO"},
+    {"id": "vt-rate-limited", "expected": "INFO", "expect_ticket": true, "note": "Failed enrichment must reach a human",
+     "virustotal": {"found": false, "error": "VirusTotal returned HTTP 429"},
+     "abuseipdb": {"abuse_confidence_score": 0, "total_reports": 0}},
+    {"id": "tor-only-low-abuse", "expected": "LOW", "note": "Tor exit with no reports is weak evidence alone",
+     "abuseipdb": {"abuse_confidence_score": 0, "total_reports": 0, "is_tor": true}}
+  ]
+}

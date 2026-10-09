@@ -92,6 +92,14 @@ The obvious question in 2026 is why severity is assigned by roughly forty lines 
 
 None of this says models have no place in a SOC. Summarisation, correlation, and hunting hypotheses are all reasonable uses. The escalation gate is not. If you are building model driven triage, this repository is a reasonable baseline to measure against: keep the ingestion, enrichment, ticketing, and test harness, replace `scoring.py`, and you have a controlled comparison over identical inputs.
 
+### Measuring the rubric
+
+```bash
+python cli.py --calibrate examples/calibration_corpus.json
+```
+
+Scores a labelled corpus and prints a confusion matrix plus two ticket-level counts: **under-triaged** (should have reached an analyst, did not) and **over-triaged**. Under-triage is the number that matters. The bundled corpus is eleven synthetic cases labelled by the maintainer, so it encodes opinion rather than ground truth, and two cases are deliberate known gaps (the saturating VirusTotal term and the missing behavioural axis). Replace it with your own labelled alerts before tuning any weight. `evaluate()` in [`calibration.py`](src/socpipeline/calibration.py) accepts any scorer with `score_alert`'s signature, which is how a model-based scorer would be compared over identical inputs.
+
 ## Known limitations
 
 Stated plainly, because finding these in week two is worse than reading them now. Each one is also a good contribution, see [Contributing](#contributing).
@@ -126,7 +134,7 @@ The residual risk is the inverse: with no caching or backoff (see below), a burs
 
 Issues and pull requests are welcome, and corrections are as welcome as features. Good places to start, roughly in order of value:
 
-1. **A calibration harness.** A labelled corpus of alerts plus a runner that reports a confusion matrix for a given weight set. This turns every argument about whether a score is correct from opinion into measurement, and it is what would let a model based scorer be compared against this rubric fairly.
+1. **A real labelled corpus.** The calibration harness exists; the bundled eleven cases are synthetic. Contributed, anonymised, labelled alerts are the most valuable input this project can receive.
 2. **Surfacing enrichment failure in the dashboard.** The API now returns `enrichment_failed` and `enrichment_errors`; the console does not render them yet.
 3. **Ratio based VirusTotal scoring** using the denominator already on the result object, with a curve instead of a linear cap.
 4. **A behavioural scoring axis** carrying event count through from the Splunk payload.
@@ -173,7 +181,7 @@ Run the test suite (fully mocked, no API keys or network access required):
 pytest tests/ -v
 ```
 
-Expected: `23 passed` in well under a second.
+Expected: `27 passed` in well under a second.
 </details>
 
 <details>
@@ -223,7 +231,7 @@ No software is bug free, and I will not claim this is. The [Known limitations](#
 - **CodeQL** scans the Python and TypeScript on every push, plus weekly on its own. New vulnerability queries ship to CodeQL over time, so a codebase that has not changed can still turn up a fresh finding.
 - **CI runs monthly even with zero commits** (`schedule:` in [`ci.yml`](.github/workflows/ci.yml)), on top of every push and PR. This catches drift that no diff in this repo would ever trigger a test for, such as an upstream API changing shape or a floating base image tag moving underneath the Dockerfile. A scheduled run that fails automatically files a tracking issue, because unlike a push, nobody is watching a cron job by default.
 - **`ruff` gates every PR** for real correctness issues, not just style.
-- **23 tests, every external API call mocked**, run against Python 3.10, 3.11, and 3.12. The Docker job does not just check that the Dockerfiles parse, it boots the actual `docker compose` stack, waits for both containers to report healthy, and curls it through the published port.
+- **27 tests, every external API call mocked**, run against Python 3.10, 3.11, and 3.12. The Docker job does not just check that the Dockerfiles parse, it boots the actual `docker compose` stack, waits for both containers to report healthy, and curls it through the published port.
 
 All of it is free on GitHub's tier for public repos, and none of it needs a human to remember to run it.
 

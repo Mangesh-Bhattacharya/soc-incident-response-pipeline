@@ -4,6 +4,7 @@
 Examples:
     python cli.py --alert examples/sample_splunk_alert.json --dry-run
     python cli.py --alert examples/sample_splunk_alert.json --json
+    python cli.py --calibrate examples/calibration_corpus.json
 """
 from __future__ import annotations
 
@@ -15,6 +16,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 from socpipeline import process_alert
+from socpipeline.calibration import evaluate, load_corpus
 
 
 def main() -> int:
@@ -30,7 +32,21 @@ def main() -> int:
         help="Run enrichment and scoring for real, but skip creating a Jira ticket",
     )
     parser.add_argument("--json", action="store_true", help="Print machine-readable JSON output")
+    parser.add_argument(
+        "--calibrate",
+        metavar="CORPUS",
+        help="Score a labelled corpus JSON file and print a confusion matrix instead of processing an alert",
+    )
     args = parser.parse_args()
+
+    if args.calibrate:
+        try:
+            cases = load_corpus(args.calibrate)
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            print(f"Cannot load corpus {args.calibrate}: {exc}", file=sys.stderr)
+            return 2
+        print(evaluate(cases).render())
+        return 0
 
     try:
         alert = json.loads(Path(args.alert).read_text(encoding="utf-8"))
