@@ -152,6 +152,17 @@ Issues and pull requests are welcome, and corrections are as welcome as features
 
 If you run this against real alert volume, the single most useful thing you can send is an alert that scored LOW and should have been CRITICAL, with the enrichment values that produced it.
 
+## Use it as a Claude skill / plugin
+
+This repo ships a [Claude Code plugin](.claude-plugin/plugin.json) with a [`soc-triage` skill](skills/soc-triage/SKILL.md): paste a Splunk alert into Claude and it runs the same `cli.py` triage — enrich, score, ticket decision, reason line — rather than guessing. It also exposes the calibration harness and the redaction tool as things you can just ask for ("calibrate this against my corpus", "redact this alert before I paste it into a bug report").
+
+```bash
+# from the repo root, inside Claude Code
+/plugin install .
+```
+
+Point any Claude product that reads `skills/soc-triage/SKILL.md` at this repo and it works the same way. The skill never overrides the deterministic scorer with a model judgment — see [Why the scoring layer is deterministic](#why-the-scoring-layer-is-deterministic) for why that line matters.
+
 ## What's inside
 
 This repo ships **three interchangeable ways to run the same logic**, plus a dashboard that visualizes any of them:

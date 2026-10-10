@@ -1,0 +1,12 @@
+{
+  "name": "soc-incident-response-pipeline",
+  "version": "1.0.0",
+  "description": "Detect, enrich, score, and ticket SOC alerts from inside Claude. Wraps the deterministic VirusTotal/AbuseIPDB/Jira triage pipeline as a Claude skill: triage a Splunk alert, run the calibration harness against a labelled corpus, and redact an alert for safe sharing.",
+  "author": {
+    "name": "Mangesh Bhattacharya",
+    "url": "https://github.com/Mangesh-Bhattacharya"
+  },
+  "homepage": "https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline",
+  "license": "MIT",
+  "keywords": ["soc", "incident-response", "threat-intel", "virustotal", "abuseipdb", "jira", "security"]
+}
