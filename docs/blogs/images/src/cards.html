@@ -1,0 +1,190 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+:root{--bg:#0b1220;--panel:#111b30;--line:#26364f;--text:#e8edf5;--mute:#93a3bb;--teal:#2dd4bf;--blue:#60a5fa;--red:#f87171;--amber:#fbbf24;--green:#4ade80}
+*{box-sizing:border-box;margin:0}
+body{background:#05080f;font-family:"Inter","Segoe UI",Helvetica,Arial,sans-serif;color:var(--text)}
+.card{width:1400px;background:var(--bg);position:relative;overflow:hidden;margin-bottom:40px}
+svg{display:block}
+text{font-family:"Inter","Segoe UI",Helvetica,Arial,sans-serif;fill:var(--text)}
+.m{fill:var(--mute)}
+.mono{font-family:"JetBrains Mono","DejaVu Sans Mono",Menlo,monospace}
+</style></head><body>
+
+<!-- 1 HERO -->
+<div class="card" id="hero" style="height:700px">
+<svg width="1400" height="700" viewBox="0 0 1400 700">
+ <defs>
+  <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2dd4bf"/><stop offset="1" stop-color="#60a5fa"/></linearGradient>
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#15223a" stroke-width="1"/></pattern>
+  <marker id="ah" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#93a3bb"/></marker>
+ </defs>
+ <rect width="1400" height="700" fill="url(#grid)"/>
+ <text x="70" y="120" font-size="26" font-weight="600" fill="#2dd4bf" style="fill:#2dd4bf;letter-spacing:3px">SOC INCIDENT RESPONSE PIPELINE</text>
+ <text x="70" y="205" font-size="58" font-weight="800">Triage inside Claude.</text>
+ <text x="70" y="285" font-size="58" font-weight="800" style="fill:#2dd4bf">Severity stays math.</text>
+ <text x="70" y="360" font-size="25" class="m">A Claude skill and plugin that runs a deterministic</text>
+ <text x="70" y="398" font-size="25" class="m">enrich, score, ticket pipeline. No model in the verdict.</text>
+ <g font-size="22" font-weight="600">
+  <rect x="70" y="470" width="170" height="48" rx="24" fill="#111b30" stroke="#26364f"/><text x="155" y="502" text-anchor="middle">Splunk</text>
+  <rect x="256" y="470" width="190" height="48" rx="24" fill="#111b30" stroke="#26364f"/><text x="351" y="502" text-anchor="middle">VirusTotal</text>
+  <rect x="462" y="470" width="190" height="48" rx="24" fill="#111b30" stroke="#26364f"/><text x="557" y="502" text-anchor="middle">AbuseIPDB</text>
+  <rect x="70" y="534" width="110" height="48" rx="24" fill="#111b30" stroke="#26364f"/><text x="125" y="566" text-anchor="middle">Jira</text>
+  <rect x="196" y="534" width="140" height="48" rx="24" fill="#111b30" stroke="#26364f"/><text x="266" y="566" text-anchor="middle">Python</text>
+  <rect x="352" y="534" width="110" height="48" rx="24" fill="#111b30" stroke="#26364f"/><text x="407" y="566" text-anchor="middle">n8n</text>
+ </g>
+ <!-- alert cards -->
+ <g>
+  <rect x="800" y="150" width="190" height="62" rx="12" fill="#111b30" stroke="#26364f"/><rect x="800" y="150" width="8" height="62" rx="4" fill="#f87171"/><text x="824" y="177" font-size="20" font-weight="700">Malware + C2</text><text x="824" y="201" font-size="17" class="m">score 100</text>
+  <rect x="780" y="236" width="190" height="62" rx="12" fill="#111b30" stroke="#26364f"/><rect x="780" y="236" width="8" height="62" rx="4" fill="#fbbf24"/><text x="804" y="263" font-size="20" font-weight="700">Brute force</text><text x="804" y="287" font-size="17" class="m">score 54</text>
+  <rect x="800" y="322" width="190" height="62" rx="12" fill="#111b30" stroke="#26364f"/><rect x="800" y="322" width="8" height="62" rx="4" fill="#60a5fa"/><text x="824" y="349" font-size="20" font-weight="700">Lookup failed</text><text x="824" y="373" font-size="17" class="m">429 rate limit</text>
+  <rect x="780" y="408" width="190" height="62" rx="12" fill="#111b30" stroke="#26364f"/><rect x="780" y="408" width="8" height="62" rx="4" fill="#4ade80" opacity=".6"/><text x="804" y="435" font-size="20" font-weight="700">Known clean</text><text x="804" y="459" font-size="17" class="m">score 0</text>
+ </g>
+ <g stroke="#93a3bb" stroke-width="2.5" fill="none">
+  <path d="M990 181 C1040 181 1050 290 1090 290"/><path d="M970 267 C1030 267 1050 310 1090 310"/><path d="M990 353 C1040 353 1050 330 1090 330"/><path d="M970 439 C1030 439 1050 350 1090 350"/>
+ </g>
+ <!-- shield -->
+ <path d="M1180 215 L1270 245 L1270 345 C1270 395 1235 425 1180 445 C1125 425 1090 395 1090 345 L1090 245 Z" fill="#111b30" stroke="url(#g1)" stroke-width="5"/>
+ <text x="1180" y="318" font-size="56" font-weight="800" text-anchor="middle" style="fill:#2dd4bf">40</text>
+ <text x="1180" y="352" font-size="17" text-anchor="middle" class="m">threshold</text>
+ <g stroke="#93a3bb" stroke-width="2.5" fill="none" marker-end="url(#ah)">
+  <path d="M1180 445 L1180 515" marker-end="url(#ah)"/>
+ </g>
+ <rect x="1080" y="520" width="200" height="64" rx="12" fill="#0f2a2a" stroke="#2dd4bf"/><text x="1180" y="560" font-size="22" font-weight="700" text-anchor="middle" style="fill:#2dd4bf">Jira ticket</text>
+ <rect x="1305" y="520" width="80" height="64" rx="12" fill="#111b30" stroke="#26364f"/><text x="1345" y="560" font-size="20" font-weight="600" text-anchor="middle" class="m">log</text>
+ 
+ <path d="M1262 385 C1310 420 1345 470 1345 518" stroke="#93a3bb" stroke-width="2.5" stroke-dasharray="6 6" fill="none" marker-end="url(#ah)"/>
+ <text x="780" y="640" font-size="19" class="m">score at or above 40, or any failed lookup, opens a ticket</text>
+</svg></div>
+
+<!-- 2 ARCHITECTURE -->
+<div class="card" id="architecture" style="height:640px">
+<svg width="1400" height="640" viewBox="0 0 1400 640">
+ <defs><marker id="a2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#93a3bb"/></marker>
+ <marker id="a2r" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f87171"/></marker></defs>
+ <text x="60" y="70" font-size="36" font-weight="800">How an alert becomes a ticket</text>
+ <text x="60" y="108" font-size="22" class="m">Same logic ships as a Python package and an importable n8n workflow</text>
+ <g font-size="22" font-weight="700" text-anchor="middle">
+  <rect x="50" y="210" width="180" height="96" rx="14" fill="#111b30" stroke="#26364f"/><text x="140" y="250">Splunk</text><text x="140" y="280" font-size="17" font-weight="400" class="m">webhook alert</text>
+  <rect x="270" y="210" width="180" height="96" rx="14" fill="#111b30" stroke="#26364f"/><text x="360" y="250">Normalize</text><text x="360" y="280" font-size="17" font-weight="400" class="m">hash, IP, host</text>
+  <rect x="490" y="150" width="190" height="96" rx="14" fill="#111b30" stroke="#60a5fa"/><text x="585" y="190">VirusTotal</text><text x="585" y="220" font-size="17" font-weight="400" class="m">file hash</text>
+  <rect x="490" y="270" width="190" height="96" rx="14" fill="#111b30" stroke="#60a5fa"/><text x="585" y="310">AbuseIPDB</text><text x="585" y="340" font-size="17" font-weight="400" class="m">source IP</text>
+  <rect x="730" y="210" width="190" height="96" rx="14" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="2.5"/><text x="825" y="250" style="fill:#2dd4bf">score_alert</text><text x="825" y="280" font-size="17" font-weight="400" class="m">0 to 100, no model</text>
+  <path d="M1040 200 L1120 258 L1040 316 L960 258 Z" fill="#111b30" stroke="#fbbf24" stroke-width="2.5"/><text x="1040" y="252" font-size="19">score ≥ 40</text><text x="1040" y="276" font-size="19">or error?</text>
+  <rect x="1200" y="150" width="150" height="80" rx="14" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="2.5"/><text x="1275" y="200" style="fill:#2dd4bf">Jira ticket</text>
+  <rect x="1200" y="290" width="150" height="80" rx="14" fill="#111b30" stroke="#26364f"/><text x="1275" y="340" class="m" style="fill:#93a3bb">Log only</text>
+ </g>
+ <g stroke="#93a3bb" stroke-width="2.5" fill="none" marker-end="url(#a2)">
+  <path d="M230 258 H270"/><path d="M450 240 L490 210"/><path d="M450 276 L490 310"/><path d="M680 198 L730 238"/><path d="M680 318 L730 278"/><path d="M920 258 H960"/>
+  <path d="M1100 232 L1200 190"/><path d="M1100 284 L1200 330"/>
+ </g>
+ <text x="1128" y="196" font-size="18" font-weight="700" style="fill:#4ade80">yes</text>
+ <text x="1128" y="338" font-size="18" font-weight="700" class="m">no</text>
+ <!-- fail closed path -->
+ <path d="M585 366 C585 470 1020 470 1040 322" stroke="#f87171" stroke-width="3" stroke-dasharray="9 7" fill="none" marker-end="url(#a2r)"/>
+ <rect x="560" y="450" width="520" height="116" rx="14" fill="#2a1416" stroke="#f87171"/>
+ <text x="590" y="492" font-size="24" font-weight="800" style="fill:#f87171">Fail closed</text>
+ <text x="590" y="526" font-size="20">429, timeout, or missing key is not a clean verdict.</text>
+ <text x="590" y="552" font-size="20">It forces a ticket at Medium or higher.</text>
+ <text x="60" y="590" font-size="20" class="m">A genuine 404 (hash never seen) still counts as a clean negative.</text>
+</svg></div>
+
+<!-- 3 SCORING -->
+<div class="card" id="scoring" style="height:620px">
+<svg width="1400" height="620" viewBox="0 0 1400 620">
+ <text x="60" y="70" font-size="36" font-weight="800">The whole rubric fits on one screen</text>
+ <text x="60" y="108" font-size="22" class="m">src/socpipeline/scoring.py: weights and thresholds you can read in one sitting</text>
+ <!-- bar -->
+ <g>
+  <rect x="60" y="190" width="40" height="70" fill="#334155"/>
+  <rect x="100" y="190" width="342" height="70" fill="#1e3a5f"/>
+  <rect x="442" y="190" width="228" height="70" fill="#7a5a0a"/>
+  <rect x="670" y="190" width="228" height="70" fill="#8a4a12"/>
+  <rect x="898" y="190" width="442" height="70" fill="#8f2a2a"/>
+ </g>
+ <g font-size="21" font-weight="700" text-anchor="middle">
+  <text x="80" y="232" font-size="16">0</text>
+  <text x="271" y="232">LOW</text><text x="556" y="232">MEDIUM</text><text x="784" y="232">HIGH</text><text x="1119" y="232">CRITICAL</text>
+ </g>
+ <g font-size="18" class="m" text-anchor="middle">
+  <text x="80" y="290">INFO</text><text x="271" y="290">1 to 39</text><text x="556" y="290">40 to 59</text><text x="784" y="290">60 to 79</text><text x="1119" y="290">80 to 100</text>
+ </g>
+ <line x1="442" y1="160" x2="442" y2="330" stroke="#2dd4bf" stroke-width="4" stroke-dasharray="8 6"/>
+ <text x="442" y="148" font-size="20" font-weight="800" text-anchor="middle" style="fill:#2dd4bf">ticket threshold: 40</text>
+ <text x="271" y="345" font-size="19" text-anchor="middle" class="m">logged only</text>
+ <text x="890" y="345" font-size="19" text-anchor="middle" style="fill:#2dd4bf">ticket created, priority follows severity</text>
+ <!-- terms -->
+ <g font-size="21">
+  <rect x="60" y="400" width="410" height="160" rx="14" fill="#111b30" stroke="#26364f"/>
+  <text x="84" y="440" font-weight="800" style="fill:#60a5fa">VirusTotal</text>
+  <text x="84" y="476">6 per malicious engine, cap 60</text>
+  <text x="84" y="508">2 per suspicious engine, cap 10</text>
+  <text x="84" y="540" class="m" font-size="18">Saturates at ten engines</text>
+  <rect x="495" y="400" width="410" height="160" rx="14" fill="#111b30" stroke="#26364f"/>
+  <text x="519" y="440" font-weight="800" style="fill:#60a5fa">AbuseIPDB</text>
+  <text x="519" y="476">confidence score at 50% weight</text>
+  <text x="519" y="508">+10 flat for a Tor exit node</text>
+  <text x="519" y="540" class="m" font-size="18">Total capped at 100</text>
+  <rect x="930" y="400" width="410" height="160" rx="14" fill="#2a1416" stroke="#f87171"/>
+  <text x="954" y="440" font-weight="800" style="fill:#f87171">Override</text>
+  <text x="954" y="476">Any failed lookup opens a</text>
+  <text x="954" y="508">ticket, Medium or higher</text>
+  <text x="954" y="540" class="m" font-size="18">Regardless of score</text>
+ </g>
+</svg></div>
+
+<!-- 4 PLUGIN FLOW -->
+<div class="card" id="plugin" style="height:600px">
+<svg width="1400" height="600" viewBox="0 0 1400 600">
+ <defs><marker id="a4" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#93a3bb"/></marker></defs>
+ <text x="60" y="70" font-size="36" font-weight="800">What the Claude skill does</text>
+ <text x="60" y="108" font-size="22" class="m">skills/soc-triage/SKILL.md, installed as a plugin with /plugin install .</text>
+ <g text-anchor="middle" font-size="22" font-weight="700">
+  <rect x="50" y="170" width="230" height="130" rx="14" fill="#111b30" stroke="#26364f"/><text x="165" y="215">You paste</text><text x="165" y="245">a Splunk alert</text><text x="165" y="276" font-size="17" font-weight="400" class="m">"is this worth escalating?"</text>
+  <rect x="330" y="170" width="250" height="130" rx="14" fill="#111b30" stroke="#60a5fa"/><text x="455" y="215">Claude loads</text><text x="455" y="245">soc-triage skill</text><text x="455" y="276" font-size="17" font-weight="400" class="m">writes alert to a temp file</text>
+  <rect x="630" y="170" width="290" height="130" rx="14" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="2.5"/><text x="775" y="212" style="fill:#2dd4bf">cli.py --dry-run --json</text><text x="775" y="248" font-size="19" font-weight="400">score_alert (deterministic)</text><text x="775" y="276" font-size="17" font-weight="400" class="m">same code as production</text>
+  <rect x="970" y="170" width="380" height="130" rx="14" fill="#111b30" stroke="#26364f"/><text x="1160" y="212">Claude reports</text><text x="1160" y="246" font-size="19" font-weight="400">score, severity, ticket decision,</text><text x="1160" y="274" font-size="19" font-weight="400">reason line, enrichment errors</text>
+ </g>
+ <g stroke="#93a3bb" stroke-width="2.5" fill="none" marker-end="url(#a4)"><path d="M280 235 H330"/><path d="M580 235 H630"/><path d="M920 235 H970"/></g>
+ <rect x="50" y="350" width="1300" height="190" rx="14" fill="#111b30" stroke="#26364f"/>
+ <text x="80" y="395" font-size="24" font-weight="800">Also available by asking</text>
+ <g font-size="21">
+  <text x="80" y="438" class="mono" style="fill:#2dd4bf">--calibrate corpus.json</text><text x="420" y="438">confusion matrix and under-triaged count</text>
+  <text x="80" y="476" class="mono" style="fill:#2dd4bf">--redact</text><text x="420" y="476">pseudonymise users, hosts, private IPs before sharing</text>
+  <text x="80" y="514" class="mono" style="fill:#f87171">boundary</text><text x="420" y="514">the skill never overrides the score with a model opinion</text>
+ </g>
+</svg></div>
+
+<!-- 5 CALIBRATION -->
+<div class="card" id="calibration" style="height:660px">
+<svg width="1400" height="660" viewBox="0 0 1400 660">
+ <text x="60" y="70" font-size="36" font-weight="800">Measuring the rubric instead of defending it</text>
+ <text x="60" y="108" font-size="22" class="m">python cli.py --calibrate examples/calibration_corpus.json, eleven synthetic labelled cases</text>
+ <text x="530" y="160" font-size="20" text-anchor="middle" class="m">predicted</text>
+ <text x="60" y="360" font-size="20" class="m" transform="rotate(-90 60 360)">expected</text>
+ <g id="mx"></g>
+ <g font-size="22">
+  <rect x="940" y="190" width="400" height="120" rx="14" fill="#111b30" stroke="#26364f"/>
+  <text x="966" y="236" class="m" font-size="19">Exact severity accuracy</text><text x="966" y="285" font-size="44" font-weight="800">9 of 11</text>
+  <rect x="940" y="330" width="400" height="120" rx="14" fill="#0f2a2a" stroke="#2dd4bf"/>
+  <text x="966" y="376" class="m" font-size="19">Under-triaged (the number that matters)</text><text x="966" y="425" font-size="44" font-weight="800" style="fill:#2dd4bf">0</text>
+  <rect x="940" y="470" width="400" height="120" rx="14" fill="#111b30" stroke="#26364f"/>
+  <text x="966" y="516" class="m" font-size="19">Over-triaged</text><text x="966" y="565" font-size="44" font-weight="800" style="fill:#fbbf24">1</text><text x="1030" y="565" font-size="19" class="m">packer-false-positive</text>
+ </g>
+ <text x="60" y="625" font-size="19" class="m">The corpus encodes the maintainer's opinion, not ground truth. Two misses are deliberate known gaps.</text>
+</svg></div>
+
+<script>
+const labels=["INFO","LOW","MEDIUM","HIGH","CRITICAL"];
+const M=[[4,0,0,0,0],[0,2,0,1,0],[0,0,1,0,0],[0,0,1,1,0],[0,0,0,0,1]];
+const g=document.getElementById('mx');const NS="http://www.w3.org/2000/svg";
+const x0=210,y0=210,w=128,h=72;
+function t(x,y,s,o={}){const e=document.createElementNS(NS,'text');e.setAttribute('x',x);e.setAttribute('y',y);e.setAttribute('text-anchor',o.a||'middle');e.setAttribute('font-size',o.f||22);e.setAttribute('font-weight',o.w||600);if(o.c)e.style.fill=o.c;e.textContent=s;g.appendChild(e);}
+labels.forEach((l,i)=>{t(x0+i*w+w/2-0,190,l,{f:16,c:'#93a3bb'});t(x0-14,y0+i*h+h/2+7,l,{a:'end',f:16,c:'#93a3bb'});});
+M.forEach((r,i)=>r.forEach((v,j)=>{const rc=document.createElementNS(NS,'rect');rc.setAttribute('x',x0+j*w+3);rc.setAttribute('y',y0+i*h+3);rc.setAttribute('width',w-6);rc.setAttribute('height',h-6);rc.setAttribute('rx',8);
+ let fill='#111b30',stroke='#1c2a42';
+ if(v>0&&i===j){fill='#0f3a36';stroke='#2dd4bf'}else if(v>0){fill='#4a2a0c';stroke='#fbbf24'}
+ rc.setAttribute('fill',fill);rc.setAttribute('stroke',stroke);g.appendChild(rc);
+ t(x0+j*w+w/2,y0+i*h+h/2+9,v===0?'·':String(v),{f:v?30:24,w:800,c:v?'#e8edf5':'#3b4a63'});}));
+</script>
+</body></html>
