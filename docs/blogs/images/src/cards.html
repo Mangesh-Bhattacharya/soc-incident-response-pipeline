@@ -1,0 +1,163 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+:root{--bg:#0b1220;--panel:#111b30;--line:#26364f;--text:#e8edf5;--mute:#93a3bb;--teal:#2dd4bf;--blue:#60a5fa;--red:#f87171;--amber:#fbbf24;--green:#4ade80}
+*{box-sizing:border-box;margin:0}
+body{background:#05080f;font-family:"Inter","Segoe UI",Helvetica,Arial,sans-serif;color:var(--text)}
+.card{width:1400px;background:var(--bg);position:relative;overflow:hidden;margin-bottom:40px}
+svg{display:block}
+text{font-family:"Inter","Segoe UI",Helvetica,Arial,sans-serif;fill:var(--text)}
+.m{fill:var(--mute)}
+.mono{font-family:"JetBrains Mono","DejaVu Sans Mono",Menlo,monospace}
+</style></head><body>
+
+<!-- 1 HERO -->
+<div class="card" id="hero" style="height:700px">
+<svg width="1400" height="700" viewBox="0 0 1400 700">
+ <defs>
+  <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2dd4bf"/><stop offset="1" stop-color="#60a5fa"/></linearGradient>
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#15223a" stroke-width="1"/></pattern>
+  <marker id="ah" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#93a3bb"/></marker>
+ </defs>
+ <rect width="1400" height="700" fill="url(#grid)"/>
+ <text x="70" y="110" font-size="24" font-weight="600" style="fill:#2dd4bf;letter-spacing:3px">SOC INCIDENT RESPONSE PIPELINE</text>
+ <text x="70" y="195" font-size="54" font-weight="800">Three changes, one week.</text>
+ <text x="70" y="268" font-size="54" font-weight="800" style="fill:#2dd4bf">Severity stayed math.</text>
+ <text x="70" y="335" font-size="24" class="m">Fail-closed enrichment shipped. A publish script and a</text>
+ <text x="70" y="370" font-size="24" class="m">Claude skill are open for review. Nothing here guesses.</text>
+
+ <!-- three status chips -->
+ <g font-size="18" font-weight="700">
+  <rect x="70" y="430" width="250" height="56" rx="28" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="2"/>
+  <circle cx="98" cy="458" r="7" fill="#2dd4bf"/>
+  <text x="118" y="465">Fail-closed, merged</text>
+
+  <rect x="336" y="430" width="300" height="56" rx="28" fill="#111b30" stroke="#60a5fa" stroke-width="2"/>
+  <circle cx="364" cy="458" r="7" fill="#60a5fa"/>
+  <text x="384" y="465">Publish script, PR #36</text>
+
+  <rect x="652" y="430" width="270" height="56" rx="28" fill="#111b30" stroke="#60a5fa" stroke-width="2"/>
+  <circle cx="680" cy="458" r="7" fill="#60a5fa"/>
+  <text x="700" y="465">Claude skill, PR #37</text>
+ </g>
+
+ <!-- right side: shield with checkmark, same visual language as the rest of the project's graphics -->
+ <path d="M1180 170 L1270 200 L1270 300 C1270 350 1235 380 1180 400 C1125 380 1090 350 1090 300 L1090 200 Z" fill="#111b30" stroke="url(#g1)" stroke-width="5"/>
+ <path d="M1140 280 L1170 312 L1230 240" stroke="#2dd4bf" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+ <text x="1180" y="440" font-size="18" text-anchor="middle" class="m">37 tests passing</text>
+
+ <g font-size="20" font-weight="600" text-anchor="middle">
+  <rect x="1030" y="480" width="150" height="46" rx="23" fill="#111b30" stroke="#26364f"/><text x="1105" y="509">Splunk</text>
+  <rect x="1200" y="480" width="150" height="46" rx="23" fill="#111b30" stroke="#26364f"/><text x="1275" y="509">Jira</text>
+  <rect x="1030" y="536" width="150" height="46" rx="23" fill="#111b30" stroke="#26364f"/><text x="1105" y="565">Claude</text>
+  <rect x="1200" y="536" width="150" height="46" rx="23" fill="#111b30" stroke="#26364f"/><text x="1275" y="565">Medium</text>
+ </g>
+ <text x="70" y="650" font-size="19" class="m">github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline</text>
+</svg></div>
+
+<!-- 2 TIMELINE -->
+<div class="card" id="timeline" style="height:520px">
+<svg width="1400" height="520" viewBox="0 0 1400 520">
+ <defs><marker id="at" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#26364f"/></marker></defs>
+ <text x="60" y="68" font-size="34" font-weight="800">This week, three workstreams</text>
+ <text x="60" y="104" font-size="21" class="m">Oct 9 to Oct 10, 2026 &#8212; one landed on main, two are open for review</text>
+
+ <line x1="110" y1="220" x2="1310" y2="220" stroke="#26364f" stroke-width="4" marker-end="url(#at)"/>
+
+ <!-- node 1: merged -->
+ <circle cx="180" cy="220" r="16" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="4"/>
+ <text x="180" y="180" font-size="18" text-anchor="middle" class="m">Oct 9</text>
+ <rect x="50" y="250" width="260" height="190" rx="14" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="2.5"/>
+ <text x="76" y="290" font-size="21" font-weight="800" style="fill:#2dd4bf">Merged &#183; PR #35</text>
+ <text x="76" y="326" font-size="19" font-weight="700">Fail-closed scoring,</text>
+ <text x="76" y="352" font-size="19" font-weight="700">calibration, redaction</text>
+ <text x="76" y="388" font-size="17" class="m">660 insertions &#183; 14 files</text>
+ <text x="76" y="412" font-size="17" class="m">33 tests passing</text>
+
+ <!-- node 2: open PR 36 -->
+ <circle cx="700" cy="220" r="16" fill="#111b30" stroke="#60a5fa" stroke-width="4"/>
+ <text x="700" y="180" font-size="18" text-anchor="middle" class="m">Oct 9</text>
+ <rect x="570" y="250" width="260" height="190" rx="14" fill="#111b30" stroke="#60a5fa" stroke-width="2.5"/>
+ <text x="596" y="290" font-size="21" font-weight="800" style="fill:#60a5fa">Open &#183; PR #36</text>
+ <text x="596" y="326" font-size="19" font-weight="700">Draft-only Medium</text>
+ <text x="596" y="352" font-size="19" font-weight="700">publishing script</text>
+ <text x="596" y="388" font-size="17" class="m">158 insertions &#183; 4 tests</text>
+ <text x="596" y="412" font-size="17" class="m">no token, no network</text>
+
+ <!-- node 3: open PR 37 -->
+ <circle cx="1220" cy="220" r="16" fill="#111b30" stroke="#60a5fa" stroke-width="4"/>
+ <text x="1220" y="180" font-size="18" text-anchor="middle" class="m">Oct 10</text>
+ <rect x="1090" y="250" width="260" height="190" rx="14" fill="#111b30" stroke="#60a5fa" stroke-width="2.5"/>
+ <text x="1116" y="290" font-size="21" font-weight="800" style="fill:#60a5fa">Open &#183; PR #37</text>
+ <text x="1116" y="326" font-size="19" font-weight="700">Claude Code plugin</text>
+ <text x="1116" y="352" font-size="19" font-weight="700">+ soc-triage skill</text>
+ <text x="1116" y="388" font-size="17" class="m">83 insertions &#183; 3 files</text>
+ <text x="1116" y="412" font-size="17" class="m">wraps cli.py, no new logic</text>
+
+ <text x="60" y="490" font-size="18" class="m">Every box is a real PR on the repo today, not a roadmap item.</text>
+</svg></div>
+
+<!-- 3 CALIBRATION -->
+<div class="card" id="calibration" style="height:660px">
+<svg width="1400" height="660" viewBox="0 0 1400 660">
+ <text x="60" y="70" font-size="36" font-weight="800">The rubric, measured again this week</text>
+ <text x="60" y="108" font-size="22" class="m">python cli.py --calibrate examples/calibration_corpus.json &#8212; real output, eleven labelled cases</text>
+ <text x="530" y="160" font-size="20" text-anchor="middle" class="m">predicted</text>
+ <text x="60" y="360" font-size="20" class="m" transform="rotate(-90 60 360)">expected</text>
+ <g id="mx"></g>
+ <g font-size="22">
+  <rect x="940" y="190" width="400" height="120" rx="14" fill="#111b30" stroke="#26364f"/>
+  <text x="966" y="236" class="m" font-size="19">Exact severity accuracy</text><text x="966" y="285" font-size="44" font-weight="800">9 of 11</text>
+  <rect x="940" y="330" width="400" height="120" rx="14" fill="#0f2a2a" stroke="#2dd4bf"/>
+  <text x="966" y="376" class="m" font-size="19">Under-triaged (the number that matters)</text><text x="966" y="425" font-size="44" font-weight="800" style="fill:#2dd4bf">0</text>
+  <rect x="940" y="470" width="400" height="120" rx="14" fill="#111b30" stroke="#26364f"/>
+  <text x="966" y="516" class="m" font-size="19">Over-triaged</text><text x="966" y="565" font-size="44" font-weight="800" style="fill:#fbbf24">1</text><text x="1030" y="565" font-size="19" class="m">packer-false-positive</text>
+ </g>
+ <text x="60" y="625" font-size="19" class="m">The corpus encodes the maintainer's opinion, not ground truth. Two misses are deliberate known gaps.</text>
+</svg></div>
+
+<!-- 4 TEST STATS -->
+<div class="card" id="teststats" style="height:520px">
+<svg width="1400" height="520" viewBox="0 0 1400 520">
+ <text x="60" y="70" font-size="36" font-weight="800">Every change this week shipped with tests</text>
+ <text x="60" y="108" font-size="22" class="m">pytest -v, run just now against this week's code &#8212; no network, no live API keys</text>
+
+ <g font-size="22">
+  <rect x="60" y="160" width="400" height="190" rx="14" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="2.5"/>
+  <text x="86" y="204" class="m" font-size="19">socpipeline suite</text>
+  <text x="86" y="270" font-size="52" font-weight="800" style="fill:#2dd4bf">33</text>
+  <text x="170" y="270" font-size="22" class="m">passed</text>
+  <text x="86" y="312" font-size="18" class="m">abuseipdb, virustotal, scoring,</text>
+  <text x="86" y="336" font-size="18" class="m">pipeline, redact, calibration, api</text>
+
+  <rect x="500" y="160" width="400" height="190" rx="14" fill="#111b30" stroke="#60a5fa" stroke-width="2.5"/>
+  <text x="526" y="204" class="m" font-size="19">publish_medium_draft (PR #36)</text>
+  <text x="526" y="270" font-size="52" font-weight="800" style="fill:#60a5fa">4</text>
+  <text x="580" y="270" font-size="22" class="m">passed</text>
+  <text x="526" y="312" font-size="18" class="m">title/body parsing, link rewriting,</text>
+  <text x="526" y="336" font-size="18" class="m">draft-only status is hard-coded</text>
+
+  <rect x="940" y="160" width="400" height="190" rx="14" fill="#111b30" stroke="#26364f"/>
+  <text x="966" y="204" class="m" font-size="19">Combined, this week</text>
+  <text x="966" y="270" font-size="52" font-weight="800">37</text>
+  <text x="1040" y="270" font-size="22" class="m">passed, 0 failed</text>
+  <text x="966" y="312" font-size="18" class="m">every external API call is</text>
+  <text x="966" y="336" font-size="18" class="m">mocked across both suites</text>
+ </g>
+ <text x="60" y="420" font-size="19" class="m">Numbers come straight from running the suites, not from a changelog.</text>
+</svg></div>
+
+<script>
+const labels=["INFO","LOW","MEDIUM","HIGH","CRITICAL"];
+const M=[[4,0,0,0,0],[0,2,0,1,0],[0,0,1,0,0],[0,0,1,1,0],[0,0,0,0,1]];
+const g=document.getElementById('mx');const NS="http://www.w3.org/2000/svg";
+const x0=210,y0=210,w=128,h=72;
+function t(x,y,s,o={}){const e=document.createElementNS(NS,'text');e.setAttribute('x',x);e.setAttribute('y',y);e.setAttribute('text-anchor',o.a||'middle');e.setAttribute('font-size',o.f||22);e.setAttribute('font-weight',o.w||600);if(o.c)e.style.fill=o.c;e.textContent=s;g.appendChild(e);}
+labels.forEach((l,i)=>{t(x0+i*w+w/2-0,190,l,{f:16,c:'#93a3bb'});t(x0-14,y0+i*h+h/2+7,l,{a:'end',f:16,c:'#93a3bb'});});
+M.forEach((r,i)=>r.forEach((v,j)=>{const rc=document.createElementNS(NS,'rect');rc.setAttribute('x',x0+j*w+3);rc.setAttribute('y',y0+i*h+3);rc.setAttribute('width',w-6);rc.setAttribute('height',h-6);rc.setAttribute('rx',8);
+ let fill='#111b30',stroke='#1c2a42';
+ if(v>0&&i===j){fill='#0f3a36';stroke='#2dd4bf'}else if(v>0){fill='#4a2a0c';stroke='#fbbf24'}
+ rc.setAttribute('fill',fill);rc.setAttribute('stroke',stroke);g.appendChild(rc);
+ t(x0+j*w+w/2,y0+i*h+h/2+9,v===0?'·':String(v),{f:v?30:24,w:800,c:v?'#e8edf5':'#3b4a63'});}));
+</script>
+</body></html>
