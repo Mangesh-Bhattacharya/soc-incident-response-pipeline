@@ -4,7 +4,7 @@
 
 | Field | Value |
 |---|---|
-| Repo / branch | `Mangesh-Bhattacharya/soc-incident-response-pipeline` / `main`, plus open PRs [#36](https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline/pull/36) and [#37](https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline/pull/37) |
+| Repo / branch | `Mangesh-Bhattacharya/soc-incident-response-pipeline` / `main`, plus open PR [#36](https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline/pull/36) ([#37](https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline/pull/37) merged 2026-10-16, after this post was drafted) |
 | Audience | Security engineers, SOC automation builders, people evaluating Claude skills for security work |
 | Tone | Technical, direct |
 | Length | About 1,290 words |
@@ -52,7 +52,7 @@ Source for all four: `docs/blogs/images/src/cards.html`, rendered with `scripts/
 > Because I don't trust any script, mine included, enough to let it press publish unattended. `publishStatus: "draft"` is hard-coded in the request body in PR #36, not a flag you can flip, so the worst case is an extra draft sitting in my Medium account, not a bad post going live.
 
 **"When will #36 / #37 merge?"**
-> Both are open for review right now, links are in the post. If you read either and have feedback, a comment on the PR is the fastest way to move it along — I'd rather merge something a second pair of eyes looked at than merge on my own schedule.
+> #37 merged on 2026-10-16. #36 is still open for review as a draft, link is in the post. If you read it and have feedback, a comment on the PR is the fastest way to move it along — I'd rather merge something a second pair of eyes looked at than merge on my own schedule.
 
 ## Publishing
 

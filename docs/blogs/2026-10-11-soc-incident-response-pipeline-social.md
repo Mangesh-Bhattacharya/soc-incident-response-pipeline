@@ -8,7 +8,7 @@ What shipped and what's open for review:
 
 - Merged: enrichment failures (rate limit, timeout, missing key) now force a ticket instead of scoring as clean. A calibration harness and an allowlist-based redaction tool shipped alongside it.
 - Open for review: a draft-only Medium publishing script — the request body hard-codes draft status, there's no flag that turns it into an auto-publisher.
-- Open for review: a Claude Code plugin and skill that runs the exact same deterministic scorer from inside a Claude chat. It's instructed not to override the score, ever — if a verdict looks wrong, that's a signal to add the case to the calibration corpus, not to let a model talk its way around the number.
+- Merged (as of 2026-10-16): a Claude Code plugin and skill that runs the exact same deterministic scorer from inside a Claude chat. It's instructed not to override the score, ever — if a verdict looks wrong, that's a signal to add the case to the calibration corpus, not to let a model talk its way around the number.
 
 Real numbers, not a changelog: 33 tests passing in the core pipeline, 4 more in the new publishing script's suite, and a calibration run against eleven labelled cases scoring 9/11 exact with zero under-triaged alerts.
 
@@ -26,9 +26,9 @@ Repo: https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline
 
 2/ The fix: enrichment failures (429, timeout, missing key) now force a Jira ticket at Medium+ instead of scoring 0/INFO. Trade is a flooded queue instead of silent loss during an outage — the safer failure. Merged, with a calibration harness and a redaction tool in the same PR.
 
-3/ Also shipped this week, both open for review:
-- A script that drafts this project's own Medium posts. publishStatus is hard-coded to "draft" — no flag flips it to auto-publish.
-- A Claude Code skill that runs the same scorer from inside a chat. It cannot override the score; a wrong-looking number is a cue to fix the calibration corpus, not argue with the model.
+3/ Also shipped this week:
+- A script (open for review) that drafts this project's own Medium posts. publishStatus is hard-coded to "draft" — no flag flips it to auto-publish.
+- A Claude Code skill (merged 10/16) that runs the same scorer from inside a chat. It cannot override the score; a wrong-looking number is a cue to fix the calibration corpus, not argue with the model.
 
 4/ Numbers, not vibes: 33 tests passing in the core suite, 4 in the new publishing script's suite, 9/11 exact on the calibration corpus with 0 under-triaged alerts. Every external API call is mocked.
 

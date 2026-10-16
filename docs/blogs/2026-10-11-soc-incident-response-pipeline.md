@@ -6,7 +6,9 @@
 
 ## TL;DR
 
-In the span of two days this deterministic SOC triage pipeline went through three changes: a fail-closed fix that keeps a VirusTotal rate limit from silently dropping alerts (now merged), a script that drafts this project's own Medium posts without ever hitting "publish" for you (open for review), and a package that lets Claude run the same scorer from inside a chat session (also open for review). None of it touches the one rule the project is built around: severity is still arithmetic, not a model guess. Repo: [soc-incident-response-pipeline](https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline).
+In the span of two days this deterministic SOC triage pipeline went through three changes: a fail-closed fix that keeps a VirusTotal rate limit from silently dropping alerts (merged), a script that drafts this project's own Medium posts without ever hitting "publish" for you (still open for review), and a package that lets Claude run the same scorer from inside a chat session (merged). None of it touches the one rule the project is built around: severity is still arithmetic, not a model guess. Repo: [soc-incident-response-pipeline](https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline).
+
+*Update, Oct 16: [PR #37](https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline/pull/37) merged after this post was drafted. [PR #36](https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline/pull/36) is still open and has grown well beyond the publishing script described below — it now also adds a cross-platform launcher, a documentation-only support bot, and collaboration docs, and remains a draft. The specific insertion/test counts for #36 further down reflect its scope at the time of writing, not its current size.*
 
 ## What it is
 
@@ -18,7 +20,7 @@ This week added three things on top of that:
 - A calibration harness (`cli.py --calibrate`) that scores a labelled alert corpus and reports under-triaged and over-triaged counts. Merged.
 - An allowlist-based redaction tool (`cli.py --redact`) that pseudonymises users, hosts, and private IPs with a salted HMAC before an alert leaves the building. Merged.
 - A draft-only script that turns a post in `docs/blogs/` into a Medium draft, never a published post. Open in [PR #36](https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline/pull/36).
-- A Claude Code plugin and `soc-triage` skill that wraps `cli.py` so you can paste an alert into a Claude chat and get the same deterministic verdict back. Open in [PR #37](https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline/pull/37).
+- A Claude Code plugin and `soc-triage` skill that wraps `cli.py` so you can paste an alert into a Claude chat and get the same deterministic verdict back. Merged in [PR #37](https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline/pull/37).
 
 ## Why it matters
 
@@ -26,7 +28,7 @@ The project's one hard rule is that severity is arithmetic you can read in one f
 
 The fail-closed fix matters because the old failure mode was invisible: a burst of correlated alerts exhausting the VirusTotal free tier used to turn every later alert into a clean `0/INFO` verdict, which looks identical to a genuinely benign alert in a dashboard. Now it is ticketed at Medium or higher and named in the reason line, which trades silent loss for a flooded queue, a trade the README is explicit about.
 
-The two open PRs matter for a different reason: they are about distribution, not detection, and they are worth being honest about the boundary each one keeps. The publishing script hard-codes `publishStatus: "draft"` in the request body, not as a config default, so there is no flag that turns it into an auto-publisher. The Claude skill is scoped the same way: its own instructions tell Claude not to override or second-guess the score with a judgment call, and to treat a wrong-looking number as a reason to add the case to the calibration corpus, not to talk the user out of it. A tool that makes a deterministic system easier to reach is only safe if it cannot quietly make the system non-deterministic, and both of these were built to fail on the side of a human still being in the loop.
+The other two changes matter for a different reason: they are about distribution and accessibility, not detection, and they are worth being honest about the boundary each one keeps. The publishing script hard-codes `publishStatus: "draft"` in the request body, not as a config default, so there is no flag that turns it into an auto-publisher. The Claude skill is scoped the same way: its own instructions tell Claude not to override or second-guess the score with a judgment call, and to treat a wrong-looking number as a reason to add the case to the calibration corpus, not to talk the user out of it. A tool that makes a deterministic system easier to reach is only safe if it cannot quietly make the system non-deterministic, and both of these were built to fail on the side of a human still being in the loop.
 
 ## Install
 
@@ -91,8 +93,8 @@ Splunk alert --> normalize --> VirusTotal (hash) --> AbuseIPDB (IP) --> score_al
 | PR | What | Status | Size |
 |---|---|---|---|
 | [#35](https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline/pull/35) Fail-closed enrichment, calibration harness, alert redaction | Enrichment errors now force a ticket; `--calibrate` scores a labelled corpus; `--redact` pseudonymises alerts for sharing | Merged | 660 insertions, 14 files |
-| [#36](https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline/pull/36) Draft-only Medium publishing script | Reads `MEDIUM_TOKEN` from the environment only, hard-codes `publishStatus: draft`, rewrites relative links to GitHub URLs | Open | 158 insertions, 4 tests |
-| [#37](https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline/pull/37) Claude Code plugin + `soc-triage` skill | Wraps `cli.py` as a Claude skill: triage an alert, run calibration, redact, with no logic reimplemented | Open | 83 insertions, 3 files |
+| [#36](https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline/pull/36) Draft-only Medium publishing script | Reads `MEDIUM_TOKEN` from the environment only, hard-codes `publishStatus: draft`, rewrites relative links to GitHub URLs | Open (draft; size at time of writing — see note above) | 158 insertions, 4 tests |
+| [#37](https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline/pull/37) Claude Code plugin + `soc-triage` skill | Wraps `cli.py` as a Claude skill: triage an alert, run calibration, redact, with no logic reimplemented | Merged | 83 insertions, 3 files |
 
 The interesting line from the merged fix, in [`scoring.py`](https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline/blob/main/src/socpipeline/scoring.py):
 
@@ -112,11 +114,11 @@ The enrichment clients already separated "not found" from "lookup failed"; the s
 
 From the README, still true this week: the VirusTotal term saturates at ten engines (`min(malicious * 6, 60)`), scoring uses absolute detection counts rather than ratios, there is no behavioural axis (forty failed logins scores the same as one), there is no enrichment caching or backoff so the fail-closed fix can flood the queue during a real outage, and the n8n webhook accepts unauthenticated POSTs by default unless you put it behind a shared secret.
 
-Specific to this week's two open items: neither PR #36 nor PR #37 is merged yet, so treat both as proposed, not shipped. The publishing script does not upload images, Medium's API for new integration tokens is no longer issued to new applications so it may be unusable for your account, and the Claude skill is a thin wrapper, it adds no detection logic of its own and inherits every limitation above unchanged.
+Specific to this week's items: PR #37 is merged, so the Claude skill above is live on `main` — it is a thin wrapper, adds no detection logic of its own, and inherits every limitation above unchanged. PR #36 is still open and in draft; treat it as proposed, not shipped. The publishing script it carries does not upload images, and Medium's API for new integration tokens is no longer issued to new applications so it may be unusable for your account.
 
 ## Contributing
 
-Repo: [soc-incident-response-pipeline](https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline). The two open PRs above are real, reviewable diffs, not a roadmap, so reading one and leaving a comment is a legitimate first contribution. Past that, the single most valuable thing this project can receive is a real labelled corpus: the bundled calibration set is eleven synthetic cases the maintainer wrote, and `python cli.py --calibrate <your-corpus>.json` works against anything shaped like it.
+Repo: [soc-incident-response-pipeline](https://github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline). PR #36 above is a real, reviewable diff, not a roadmap, so reading it and leaving a comment is a legitimate first contribution. Past that, the single most valuable thing this project can receive is a real labelled corpus: the bundled calibration set is eleven synthetic cases the maintainer wrote, and `python cli.py --calibrate <your-corpus>.json` works against anything shaped like it.
 
 ---
 
