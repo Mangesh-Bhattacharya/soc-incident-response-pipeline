@@ -30,10 +30,18 @@ jobs:
         run: ruff check .
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
+        os: [ubuntu-latest]
         python-version: ["3.10", "3.11", "3.12"]
+        include:
+          # Same suite on the other desktop OSes the README promises.
+          - os: windows-latest
+            python-version: "3.12"
+          - os: macos-latest
+            python-version: "3.12"
     steps:
       - uses: actions/checkout@v7
 
@@ -52,9 +60,16 @@ jobs:
         run: python -c "import json; json.load(open('n8n/soc_triage_workflow.json', encoding='utf-8'))"
 
       - name: Smoke-test CLI (dry run, no API keys required for the low-score path)
+        shell: bash
         run: |
-          echo '{"rule_name":"CI Smoke Test","host":"ci-runner","user":"ci"}' > /tmp/ci_alert.json
-          python cli.py --alert /tmp/ci_alert.json --json | grep -q '"severity": "INFO"'
+          echo '{"rule_name":"CI Smoke Test","host":"ci-runner","user":"ci"}' > "$RUNNER_TEMP/ci_alert.json"
+          python cli.py --alert "$RUNNER_TEMP/ci_alert.json" --json | grep -q '"severity": "INFO"'
+
+      - name: Launcher self-diagnosis runs (exit code 0 or 1 are both valid, a crash is not)
+        shell: bash
+        run: |
+          python launch.py --doctor --json > "$RUNNER_TEMP/doctor.json" || [ $? -eq 1 ]
+          python -c "import json,sys; json.load(open(sys.argv[1]))" "$RUNNER_TEMP/doctor.json"
 
   dashboard:
     runs-on: ubuntu-latest

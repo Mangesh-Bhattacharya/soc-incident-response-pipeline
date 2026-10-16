@@ -1,0 +1,17 @@
+name: Feature or collaboration idea
+description: Propose a feature, or offer to take one of the open items in the README
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What should change, and why does it make triage more correct?
+    validations:
+      required: true
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Collaboration
+      options:
+        - label: I would like to build this myself
+        - label: I can contribute labelled alerts or test environments

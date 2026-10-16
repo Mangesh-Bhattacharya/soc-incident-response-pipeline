@@ -1,0 +1,31 @@
+name: Install or runtime problem
+description: Something does not install, start, or work
+labels: ["bug", "support"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Try `python launch.py --doctor` first (Windows: `py launch.py --doctor`). It diagnoses most install problems and prints the fix.
+        **Never paste API keys, tokens or real alerts.**
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Output of `python launch.py --doctor --json`
+      description: Contains no secrets, usernames, paths or hostnames.
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What did you run, and what happened?
+      description: The exact command and the last lines of output.
+    validations:
+      required: true
+  - type: dropdown
+    id: how
+    attributes:
+      label: How are you running it?
+      options: [Docker Compose, Python CLI, Dashboard only (npm), n8n workflow, Other]
+    validations:
+      required: true

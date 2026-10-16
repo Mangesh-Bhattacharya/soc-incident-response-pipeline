@@ -1,0 +1,26 @@
+name: Support bot
+
+on:
+  issues:
+    types: [opened]
+
+# Least privilege: read the repo, write one comment. Nothing else.
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  respond:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Answer from the docs (no-op unless ANTHROPIC_API_KEY is set as a repo secret)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python scripts/support_bot.py
