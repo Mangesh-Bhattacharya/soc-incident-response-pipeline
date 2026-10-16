@@ -25,12 +25,12 @@
 
 | File | Placement | Caption | Alt text |
 |---|---|---|---|
-| `hero.png` | Below the title, before TL;DR | Three changes, one week: fail-closed merged, a publish script and a Claude skill open for review. | Dark hero graphic listing three project changes this week with a shield-and-checkmark icon and four tool chips: Splunk, Jira, Claude, Medium. |
-| `weekly-timeline.png` | In "How it works", above the PR table | Timeline of this week's three PRs: one merged, two open for review, each with its real insertion and test counts. | Horizontal timeline with three nodes dated Oct 9, Oct 9, and Oct 10, each showing a PR number, title, and real insertion/test counts. |
-| `calibration-matrix.png` | In "How it works", after the code snippet | Confusion matrix from the calibration harness: 9 of 11 exact, 0 under-triaged, 1 over-triaged. | 5x5 confusion matrix over INFO/LOW/MEDIUM/HIGH/CRITICAL with two off-diagonal misses highlighted, next to three stat tiles. |
-| `test-stats.png` | In "How it works", last image | Test counts: 33 passing in the pipeline suite, 4 in the new publishing script's suite, 37 total. | Three stat tiles showing 33, 4, and 37 passing tests across two test suites, both fully mocked. |
+| `2026-10-11-hero.png` | Below the title, before TL;DR | Three changes, one week: fail-closed merged, a publish script and a Claude skill open for review. | Dark hero graphic listing three project changes this week with a shield-and-checkmark icon and four tool chips: Splunk, Jira, Claude, Medium. |
+| `2026-10-11-weekly-timeline.png` | In "How it works", above the PR table | Timeline of this week's three PRs: one merged, two open for review, each with its real insertion and test counts. | Horizontal timeline with three nodes dated Oct 9, Oct 9, and Oct 10, each showing a PR number, title, and real insertion/test counts. |
+| `2026-10-11-calibration-matrix.png` | In "How it works", after the code snippet | Confusion matrix from the calibration harness: 9 of 11 exact, 0 under-triaged, 1 over-triaged. | 5x5 confusion matrix over INFO/LOW/MEDIUM/HIGH/CRITICAL with two off-diagonal misses highlighted, next to three stat tiles. |
+| `2026-10-11-test-stats.png` | In "How it works", last image | Test counts: 33 passing in the pipeline suite, 4 in the new publishing script's suite, 37 total. | Three stat tiles showing 33, 4, and 37 passing tests across two test suites, both fully mocked. |
 
-Source for all four: `docs/blogs/images/src/cards.html`, rendered with `scripts/render_blog_graphics.py` (Playwright + the preinstalled Chromium at `/opt/pw-browsers/chromium`, set via `CHROMIUM_PATH`). Each was screenshotted at its own SVG element id and re-viewed with an image read before committing; one overflow in the hero's status chips was caught that way and fixed before the final render.
+Source for all four: `docs/blogs/images/src/2026-10-11-cards.html`, rendered with `scripts/render_blog_graphics_2026-10-11.py` (Playwright + the preinstalled Chromium at `/opt/pw-browsers/chromium`, set via `CHROMIUM_PATH`). Each was screenshotted at its own SVG element id and re-viewed with an image read before committing; one overflow in the hero's status chips was caught that way and fixed before the final render.
 
 ## Where to post
 

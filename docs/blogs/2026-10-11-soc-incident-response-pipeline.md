@@ -2,7 +2,7 @@
 
 *Draft for Medium. Companion metadata, image prompts, and comment replies: [`2026-10-11-soc-incident-response-pipeline.meta.md`](2026-10-11-soc-incident-response-pipeline.meta.md).*
 
-![Three changes, one week: fail-closed merged, a publish script and a Claude skill open for review](images/hero.png)
+![Three changes, one week: fail-closed merged, a publish script and a Claude skill open for review](images/2026-10-11-hero.png)
 
 ## TL;DR
 
@@ -86,7 +86,7 @@ Splunk alert --> normalize --> VirusTotal (hash) --> AbuseIPDB (IP) --> score_al
                                               enrichment_errors --> force ticket, priority >= Medium
 ```
 
-![Timeline of this week's three PRs: one merged, two open for review, each with its real insertion and test counts](images/weekly-timeline.png)
+![Timeline of this week's three PRs: one merged, two open for review, each with its real insertion and test counts](images/2026-10-11-weekly-timeline.png)
 
 ### This week's three PRs
 
@@ -106,9 +106,9 @@ def should_create_ticket(self) -> bool:
 
 The enrichment clients already separated "not found" from "lookup failed"; the scorer just never read the distinction before this week.
 
-![Confusion matrix from the calibration harness: 9 of 11 exact, 0 under-triaged, 1 over-triaged](images/calibration-matrix.png)
+![Confusion matrix from the calibration harness: 9 of 11 exact, 0 under-triaged, 1 over-triaged](images/2026-10-11-calibration-matrix.png)
 
-![Test counts: 33 passing in the pipeline suite, 4 in the new publishing script's suite, 37 total](images/test-stats.png)
+![Test counts: 33 passing in the pipeline suite, 4 in the new publishing script's suite, 37 total](images/2026-10-11-test-stats.png)
 
 ## Known limitations
 
