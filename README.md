@@ -24,6 +24,15 @@ docker compose up --build
 
 Open **http://localhost:8080**. No Python or Node.js install on the host. The dashboard and API run in containers behind an nginx reverse proxy, bound to `127.0.0.1` by default so it needs no firewall exception on Linux, macOS, or Windows. See [`docs/docker.md`](docs/docker.md) for the security rationale and how to expose it to your LAN if you want that.
 
+Or let the launcher do it, on Windows, macOS or Linux (`py launch.py` on Windows):
+
+```bash
+python launch.py          # checks your setup, starts the stack, waits until healthy, opens the dashboard
+python launch.py --doctor # diagnose only: prints the exact fix for every problem it finds
+```
+
+Something not working? [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) covers Docker, Python, the dashboard, and opening it from a phone, and `python launch.py --doctor --json` produces a report that is safe to paste into an issue.
+
 Prefer to run it without Docker? See [Other ways to run this](#other-ways-to-run-this).
 
 ## Why this exists
@@ -140,7 +149,7 @@ The residual risk is the inverse: with no caching or backoff (see below), a burs
 
 ## Contributing
 
-Issues and pull requests are welcome, and corrections are as welcome as features. Good places to start, roughly in order of value:
+This project is built to be worked on together, not just forked. Read [`CONTRIBUTING.md`](CONTRIBUTING.md), use the issue forms (install problems, misjudged alerts, feature ideas), and report vulnerabilities privately per [`SECURITY.md`](SECURITY.md). Corrections are as welcome as features. Good places to start, roughly in order of value:
 
 1. **A real labelled corpus.** The calibration harness exists; the bundled eleven cases are synthetic. Contributed, anonymised, labelled alerts are the most valuable input this project can receive.
 2. **Surfacing enrichment failure in the dashboard.** The API now returns `enrichment_failed` and `enrichment_errors`; the console does not render them yet.
@@ -148,7 +157,7 @@ Issues and pull requests are welcome, and corrections are as welcome as features
 4. **A behavioural scoring axis** carrying event count through from the Splunk payload.
 5. **Enrichment caching with backoff**, keyed on hash and address with a short time to live.
 6. **An additional ticketing backend.** `jira_client.py` is small and isolated, so ServiceNow or TheHive would each be contained.
-7. **Windows setup notes for the README.** `python -m venv` can produce an environment without a working pip, and `ensurepip` may fail to repair it, while installing against the system interpreter with `--user` works. Worth documenting.
+7. **Launcher coverage.** `launch.py` is tested with mocks and CI runs the suite on Linux, Windows and macOS, but it has not been run against every Docker setup. Run `python launch.py --doctor` on yours and report anything it gets wrong.
 
 If you run this against real alert volume, the single most useful thing you can send is an alert that scored LOW and should have been CRITICAL, with the enrichment values that produced it.
 
@@ -189,7 +198,7 @@ Run the test suite (fully mocked, no API keys or network access required):
 pytest tests/ -v
 ```
 
-Expected: `33 passed` in well under a second.
+Expected: `51 passed` in well under a second.
 </details>
 
 <details>
@@ -229,6 +238,8 @@ examples/            Sample Splunk alert payload used by the CLI, tests, and doc
 tests/               Pytest suite, every external API call is mocked
 docs/                Architecture diagram, design notes, and the Docker security writeup
 cli.py               Run the Python pipeline against an alert JSON file
+launch.py            One-command launcher + cross-platform self-diagnosis
+scripts/             Support bot (answers new issues from the docs) and a Medium draft helper
 ```
 
 ## Reliability and maintenance
@@ -238,8 +249,9 @@ No software is bug free, and I will not claim this is. The [Known limitations](#
 - **Dependabot** watches every dependency (Python, npm, both Docker base images, and the GitHub Actions themselves) and opens a PR the moment a security patch or version bump lands.
 - **CodeQL** scans the Python and TypeScript on every push, plus weekly on its own. New vulnerability queries ship to CodeQL over time, so a codebase that has not changed can still turn up a fresh finding.
 - **CI runs monthly even with zero commits** (`schedule:` in [`ci.yml`](.github/workflows/ci.yml)), on top of every push and PR. This catches drift that no diff in this repo would ever trigger a test for, such as an upstream API changing shape or a floating base image tag moving underneath the Dockerfile. A scheduled run that fails automatically files a tracking issue, because unlike a push, nobody is watching a cron job by default.
+- **A support bot** answers new issues from `docs/TROUBLESHOOTING.md` and the README. It has no tools, can only post one comment, and stays off unless an `ANTHROPIC_API_KEY` repository secret is set. Its output is labelled AI-generated.
 - **`ruff` gates every PR** for real correctness issues, not just style.
-- **33 tests, every external API call mocked**, run against Python 3.10, 3.11, and 3.12. The Docker job does not just check that the Dockerfiles parse, it boots the actual `docker compose` stack, waits for both containers to report healthy, and curls it through the published port.
+- **51 tests, every external API call mocked**, run against Python 3.10, 3.11, and 3.12. The Docker job does not just check that the Dockerfiles parse, it boots the actual `docker compose` stack, waits for both containers to report healthy, and curls it through the published port.
 
 All of it is free on GitHub's tier for public repos, and none of it needs a human to remember to run it.
 

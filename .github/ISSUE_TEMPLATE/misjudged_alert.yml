@@ -1,0 +1,26 @@
+name: Misjudged alert
+description: An alert scored wrongly (should have been higher or lower)
+labels: ["scoring", "calibration"]
+body:
+  - type: markdown
+    attributes:
+      value: "Redact first: `python cli.py --alert a.json --json --redact`. Never paste real hostnames, users or keys."
+  - type: input
+    id: scored
+    attributes:
+      label: Score and severity the pipeline gave
+      placeholder: "54 MEDIUM"
+    validations:
+      required: true
+  - type: input
+    id: expected
+    attributes:
+      label: Severity an analyst should have seen, and why
+    validations:
+      required: true
+  - type: textarea
+    id: enrichment
+    attributes:
+      label: Enrichment values (malicious/suspicious/harmless engine counts, abuse confidence, Tor)
+    validations:
+      required: true
