@@ -83,7 +83,7 @@ If something breaks: `python launch.py --doctor` prints the exact fix. Full guid
 - **Hours:** [roughly N hours, fill in the real number].
 - **Size:** about 2,000 lines of Python including tests and tooling, about 1,000 lines of TypeScript, 51 tests, CI on Linux, Windows and macOS.
 
-Most of that time was not the pipeline. It was Docker hardening (non-root containers, read-only filesystems, dropped capabilities, loopback-only port binding), debugging a Vite 8 / npm optional-dependency bug inside a minimal Debian image, and writing the failure-mode documentation.
+Beyond the pipeline logic, the repository shows work on Docker hardening (non-root containers, read-only filesystems, dropped capabilities, loopback-only port binding), a workaround for a Vite 8 / npm optional-dependency bug inside a minimal Debian image (documented in `dashboard/Dockerfile`), and failure-mode documentation. [Add your own account of the hardest part.]
 
 ## What I learned
 
