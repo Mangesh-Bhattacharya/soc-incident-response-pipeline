@@ -1,0 +1,46 @@
+name: Blog cycle
+
+# Opens a tracking issue every other Monday so the blog workflow
+# (blog-agent/WORKFLOW.md) has a durable trigger.
+on:
+  schedule:
+    - cron: "17 13 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  open-cycle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open cycle issue on even ISO weeks
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const now = new Date();
+            const start = Date.UTC(now.getUTCFullYear(), 0, 1);
+            const week = Math.ceil(((now - start) / 86400000 + 1) / 7);
+            if (context.eventName === 'schedule' && week % 2 !== 0) {
+              core.info(`Week ${week} is off-cycle, skipping.`);
+              return;
+            }
+            const date = now.toISOString().slice(0, 10);
+            await github.rest.issues.create({
+              ...context.repo,
+              title: `Blog cycle ${date}`,
+              body: [
+                'Follow `blog-agent/WORKFLOW.md`.',
+                '',
+                '- [ ] Scout: pick project from `blog-agent/queue.yml` (owner approves)',
+                '- [ ] Researcher: brief in `blog-agent/briefs/`',
+                '- [ ] Writer + Editor: Medium article + LinkedIn post, all gates pass',
+                '- [ ] Owner approves drafts',
+                '- [ ] Publish Medium (day 2)',
+                '- [ ] Publish LinkedIn (day 4)',
+                '- [ ] Discord share (optional)',
+                '- [ ] Comment replies drafted/approved within 24h',
+                '- [ ] Analyst: log results in `queue.yml`',
+              ].join('\n'),
+            });
