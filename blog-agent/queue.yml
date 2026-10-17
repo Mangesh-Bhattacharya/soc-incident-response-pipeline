@@ -1,0 +1,16 @@
+# status: queued | in_progress | published | skip
+# angle_used tracks which angle each project has already been written from.
+projects:
+  - repo: Mangesh-Bhattacharya/soc-incident-response-pipeline
+    status: queued
+    angle_ideas: ["why scoring is deterministic, not LLM", "automating the first 10 minutes of alert triage"]
+  - repo: Mangesh-Bhattacharya/llm-prompt-injection-firewall
+    status: queued
+    angle_ideas: ["offline prompt-injection detection: patterns vs heuristics vs TF-IDF"]
+  - repo: Mangesh-Bhattacharya/ai-security-telemetry-pipeline
+    status: queued
+    angle_ideas: ["redacting PII/secrets before AI telemetry leaves the building"]
+  - repo: Mangesh-Bhattacharya/authenticode-ai
+    status: queued
+    angle_ideas: ["detecting AI-generated code: what works and what doesn't"]
+performance_log: []   # {date, slug, channel, views, reactions, comments, inbound_leads}
