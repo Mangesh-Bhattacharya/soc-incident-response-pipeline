@@ -1,0 +1,182 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+:root{--bg:#0b1220;--panel:#111b30;--line:#26364f;--text:#e8edf5;--mute:#93a3bb;--teal:#2dd4bf;--blue:#60a5fa;--red:#f87171;--amber:#fbbf24;--green:#4ade80}
+*{box-sizing:border-box;margin:0}
+body{background:#05080f;font-family:"Inter","Segoe UI",Helvetica,Arial,sans-serif;color:var(--text)}
+.card{width:1400px;background:var(--bg);position:relative;overflow:hidden;margin-bottom:40px}
+svg{display:block}
+text{font-family:"Inter","Segoe UI",Helvetica,Arial,sans-serif;fill:var(--text)}
+.m{fill:var(--mute)}
+.mono{font-family:"JetBrains Mono","DejaVu Sans Mono",Menlo,monospace}
+</style></head><body>
+
+<!-- 1 HERO -->
+<div class="card" id="hero" style="height:700px">
+<svg width="1400" height="700" viewBox="0 0 1400 700">
+ <defs>
+  <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2dd4bf"/><stop offset="1" stop-color="#60a5fa"/></linearGradient>
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#15223a" stroke-width="1"/></pattern>
+ </defs>
+ <rect width="1400" height="700" fill="url(#grid)"/>
+ <text x="70" y="110" font-size="24" font-weight="600" style="fill:#2dd4bf;letter-spacing:3px">SOC INCIDENT RESPONSE PIPELINE</text>
+ <text x="70" y="195" font-size="52" font-weight="800">Seven roles, one cycle.</text>
+ <text x="70" y="262" font-size="52" font-weight="800" style="fill:#2dd4bf">The blog gets automated too.</text>
+ <text x="70" y="326" font-size="23" class="m">PR #46: Scout, Researcher, Writer, Editor, Publisher,</text>
+ <text x="70" y="358" font-size="23" class="m">Community, Analyst. Still a draft, nothing has run yet.</text>
+
+ <!-- status chips -->
+ <g font-size="18" font-weight="700">
+  <rect x="70" y="415" width="230" height="56" rx="28" fill="#111b30" stroke="#60a5fa" stroke-width="2"/>
+  <circle cx="98" cy="443" r="7" fill="#60a5fa"/>
+  <text x="118" y="450">Open &#183; PR #46</text>
+
+  <rect x="316" y="415" width="230" height="56" rx="28" fill="#111b30" stroke="#60a5fa" stroke-width="2"/>
+  <circle cx="344" cy="443" r="7" fill="#60a5fa"/>
+  <text x="364" y="450">182 lines, 5 files</text>
+
+  <rect x="562" y="415" width="330" height="56" rx="28" fill="#2a1a10" stroke="#f87171" stroke-width="2"/>
+  <circle cx="590" cy="443" r="7" fill="#f87171"/>
+  <text x="610" y="450">2 of 7 roles need owner OK</text>
+ </g>
+
+ <!-- right side: seven small nodes in a loop, same visual language -->
+ <g>
+  <circle cx="1150" cy="280" r="135" fill="none" stroke="#1c2a42" stroke-width="2" stroke-dasharray="4 8"/>
+  <!-- 7 nodes around circle -->
+  <g font-size="14" font-weight="700">
+   <circle cx="1150" cy="145" r="24" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="3"/><text x="1150" y="117" class="m" text-anchor="middle">Scout</text>
+   <circle cx="1267" cy="203" r="24" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="3"/><text x="1267" y="177" class="m" text-anchor="middle">Researcher</text>
+   <circle cx="1283" cy="330" r="24" fill="#111b30" stroke="#60a5fa" stroke-width="3"/><text x="1283" y="373" class="m" text-anchor="middle">Writer</text>
+   <circle cx="1203" cy="412" r="24" fill="#111b30" stroke="#60a5fa" stroke-width="3"/><text x="1203" y="455" class="m" text-anchor="middle">Editor</text>
+   <circle cx="1097" cy="412" r="24" fill="#2a1a10" stroke="#f87171" stroke-width="3"/><text x="1097" y="455" class="m" text-anchor="middle">Publisher</text>
+   <circle cx="1017" cy="330" r="24" fill="#2a1a10" stroke="#f87171" stroke-width="3"/><text x="1017" y="373" class="m" text-anchor="middle">Community</text>
+   <circle cx="1033" cy="203" r="24" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="3"/><text x="1033" y="177" class="m" text-anchor="middle">Analyst</text>
+  </g>
+  <circle cx="1150" cy="280" r="4" fill="#93a3bb"/>
+ </g>
+ <text x="70" y="650" font-size="19" class="m">github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline</text>
+</svg></div>
+
+<!-- 2 CYCLE / ARCHITECTURE -->
+<div class="card" id="cycle" style="height:620px">
+<svg width="1400" height="620" viewBox="0 0 1400 620">
+ <defs><marker id="at2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#26364f"/></marker></defs>
+ <text x="60" y="64" font-size="32" font-weight="800">The 14-day cycle, from WORKFLOW.md</text>
+ <text x="60" y="98" font-size="20" class="m">Teal = runs unattended. Blue = produces a draft. Red = owner approval required before anything goes out.</text>
+
+ <line x1="90" y1="200" x2="1330" y2="200" stroke="#26364f" stroke-width="4" marker-end="url(#at2)"/>
+
+ <!-- Day 0: Scout + Researcher -->
+ <circle cx="150" cy="200" r="14" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="4"/>
+ <text x="150" y="162" font-size="16" text-anchor="middle" class="m">Day 0</text>
+ <rect x="60" y="230" width="190" height="150" rx="12" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="2.5"/>
+ <text x="80" y="266" font-size="18" font-weight="800" style="fill:#2dd4bf">Scout</text>
+ <text x="80" y="292" font-size="15" class="m">+ Researcher</text>
+ <text x="80" y="326" font-size="14" class="m">pick project,</text>
+ <text x="80" y="348" font-size="14" class="m">write the brief</text>
+
+ <!-- Day 1: Writer + Editor -->
+ <circle cx="460" cy="200" r="14" fill="#111b30" stroke="#60a5fa" stroke-width="4"/>
+ <text x="460" y="162" font-size="16" text-anchor="middle" class="m">Day 1</text>
+ <rect x="370" y="230" width="190" height="150" rx="12" fill="#111b30" stroke="#60a5fa" stroke-width="2.5"/>
+ <text x="390" y="266" font-size="18" font-weight="800" style="fill:#60a5fa">Writer</text>
+ <text x="390" y="292" font-size="15" class="m">+ Editor</text>
+ <text x="390" y="326" font-size="14" class="m">drafts, then the</text>
+ <text x="390" y="348" font-size="14" class="m">7-gate check</text>
+
+ <!-- Day 2: Publisher (Medium) -->
+ <circle cx="770" cy="200" r="14" fill="#2a1a10" stroke="#f87171" stroke-width="4"/>
+ <text x="770" y="162" font-size="16" text-anchor="middle" class="m">Day 2</text>
+ <rect x="680" y="230" width="190" height="150" rx="12" fill="#2a1a10" stroke="#f87171" stroke-width="2.5"/>
+ <text x="700" y="266" font-size="18" font-weight="800" style="fill:#f87171">Publisher</text>
+ <text x="700" y="292" font-size="15" class="m">owner approves</text>
+ <text x="700" y="326" font-size="14" class="m">Medium: manual</text>
+ <text x="700" y="348" font-size="14" class="m">paste, no API</text>
+
+ <!-- Day 4: Publisher (LinkedIn) + Day5 Discord -->
+ <circle cx="1020" cy="200" r="14" fill="#2a1a10" stroke="#f87171" stroke-width="4"/>
+ <text x="1020" y="162" font-size="16" text-anchor="middle" class="m">Day 4-5</text>
+ <rect x="930" y="230" width="190" height="150" rx="12" fill="#2a1a10" stroke="#f87171" stroke-width="2.5"/>
+ <text x="950" y="266" font-size="18" font-weight="800" style="fill:#f87171">Community</text>
+ <text x="950" y="292" font-size="15" class="m">owner approves</text>
+ <text x="950" y="326" font-size="14" class="m">LinkedIn + Discord,</text>
+ <text x="950" y="348" font-size="14" class="m">replies within 24h</text>
+
+ <!-- Day 14: Analyst -->
+ <circle cx="1270" cy="200" r="14" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="4"/>
+ <text x="1270" y="162" font-size="16" text-anchor="middle" class="m">Day 14</text>
+ <rect x="1180" y="230" width="150" height="150" rx="12" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="2.5"/>
+ <text x="1200" y="266" font-size="18" font-weight="800" style="fill:#2dd4bf">Analyst</text>
+ <text x="1200" y="300" font-size="14" class="m">logs results to</text>
+ <text x="1200" y="322" font-size="14" class="m">queue.yml, next</text>
+ <text x="1200" y="344" font-size="14" class="m">cycle opens</text>
+
+ <text x="60" y="440" font-size="19" font-weight="700">Seven gates before Publisher runs (from WORKFLOW.md):</text>
+ <text x="60" y="476" font-size="17" class="m">1. Fact check  2. Secrets/PII scan  3. Public repos only  4. No invented experience</text>
+ <text x="60" y="504" font-size="17" class="m">5. Voice pass (VOICE.md checklist)  6. CTA present  7. UTM-tagged links</text>
+ <text x="60" y="560" font-size="18" class="m">This diagram is the cycle as specified in the PR, not a cycle that has run yet.</text>
+</svg></div>
+
+<!-- 3 CI RESULTS -->
+<div class="card" id="ci" style="height:560px">
+<svg width="1400" height="560" viewBox="0 0 1400 560">
+ <text x="60" y="68" font-size="34" font-weight="800">CI on PR #46's own commit</text>
+ <text x="60" y="104" font-size="21" class="m">7 jobs, run just now against commit cc6a144 &#8212; real GitHub Actions results, not a changelog</text>
+
+ <g font-size="18" font-weight="700">
+  <rect x="60" y="150" width="300" height="70" rx="12" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="2"/>
+  <circle cx="90" cy="185" r="8" fill="#2dd4bf"/><text x="112" y="191">lint</text>
+  <rect x="380" y="150" width="300" height="70" rx="12" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="2"/>
+  <circle cx="410" cy="185" r="8" fill="#2dd4bf"/><text x="432" y="191">dashboard build</text>
+  <rect x="700" y="150" width="300" height="70" rx="12" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="2"/>
+  <circle cx="730" cy="185" r="8" fill="#2dd4bf"/><text x="752" y="191">test (3.10, 3.11, 3.12)</text>
+  <rect x="1020" y="150" width="320" height="70" rx="12" fill="#1a2436" stroke="#26364f" stroke-width="2"/>
+  <circle cx="1050" cy="185" r="8" fill="#93a3bb"/><text x="1072" y="191" class="m">notify-on-failure (skipped)</text>
+
+  <rect x="60" y="238" width="620" height="70" rx="12" fill="#2a1a10" stroke="#f87171" stroke-width="2.5"/>
+  <circle cx="90" cy="273" r="8" fill="#f87171"/><text x="112" y="279" style="fill:#f87171">docker &#8212; failed: npm install breaks on main too</text>
+ </g>
+
+ <g font-size="22">
+  <rect x="60" y="340" width="400" height="160" rx="14" fill="#111b30" stroke="#26364f"/>
+  <text x="86" y="384" class="m" font-size="19">Jobs green on this commit</text>
+  <text x="86" y="450" font-size="52" font-weight="800" style="fill:#2dd4bf">6</text><text x="140" y="450" font-size="22" class="m">of 7</text>
+
+  <rect x="500" y="340" width="400" height="160" rx="14" fill="#111b30" stroke="#26364f"/>
+  <text x="526" y="384" class="m" font-size="19">pytest tests/ -v (unchanged)</text>
+  <text x="526" y="450" font-size="52" font-weight="800" style="fill:#60a5fa">33</text><text x="590" y="450" font-size="22" class="m">passed, 0 failed</text>
+
+  <rect x="940" y="340" width="400" height="160" rx="14" fill="#2a1a10" stroke="#f87171" stroke-width="2"/>
+  <text x="966" y="384" class="m" font-size="19">Red job also failing on main</text>
+  <text x="966" y="450" font-size="36" font-weight="800" style="fill:#f87171">pre-existing</text>
+ </g>
+</svg></div>
+
+<!-- 4 QUEUE -->
+<div class="card" id="queue" style="height:560px">
+<svg width="1400" height="560" viewBox="0 0 1400 560">
+ <text x="60" y="68" font-size="34" font-weight="800">queue.yml: what gets written about next</text>
+ <text x="60" y="104" font-size="21" class="m">Four projects queued, zero cycles completed, performance_log is an empty list today</text>
+
+ <g font-size="19">
+  <rect x="60" y="150" width="1280" height="76" rx="12" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="2"/>
+  <text x="86" y="182" font-weight="700">soc-incident-response-pipeline</text>
+  <text x="86" y="210" class="m" font-size="16">angles: deterministic vs. LLM scoring &#183; automating the first 10 minutes of triage</text>
+
+  <rect x="60" y="238" width="1280" height="76" rx="12" fill="#111b30" stroke="#26364f" stroke-width="2"/>
+  <text x="86" y="270" font-weight="700">llm-prompt-injection-firewall</text>
+  <text x="86" y="298" class="m" font-size="16">angle: offline prompt-injection detection &#8212; patterns vs. heuristics vs. TF-IDF</text>
+
+  <rect x="60" y="326" width="1280" height="76" rx="12" fill="#111b30" stroke="#26364f" stroke-width="2"/>
+  <text x="86" y="358" font-weight="700">ai-security-telemetry-pipeline</text>
+  <text x="86" y="386" class="m" font-size="16">angle: redacting PII/secrets before AI telemetry leaves the building</text>
+
+  <rect x="60" y="414" width="1280" height="76" rx="12" fill="#111b30" stroke="#26364f" stroke-width="2"/>
+  <text x="86" y="446" font-weight="700">authenticode-ai</text>
+  <text x="86" y="474" class="m" font-size="16">angle: detecting AI-generated code &#8212; what works and what doesn't</text>
+ </g>
+ <text x="60" y="530" font-size="18" class="m">All four are listed as status: queued. None has moved to in_progress or published yet.</text>
+</svg></div>
+
+</body></html>
