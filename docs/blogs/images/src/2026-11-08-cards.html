@@ -1,0 +1,165 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+:root{--bg:#0b1220;--panel:#111b30;--line:#26364f;--text:#e8edf5;--mute:#93a3bb;--teal:#2dd4bf;--blue:#60a5fa;--red:#f87171;--amber:#fbbf24;--green:#4ade80}
+*{box-sizing:border-box;margin:0}
+body{background:#05080f;font-family:"Inter","Segoe UI",Helvetica,Arial,sans-serif;color:var(--text)}
+.card{width:1400px;background:var(--bg);position:relative;overflow:hidden;margin-bottom:40px}
+svg{display:block}
+text{font-family:"Inter","Segoe UI",Helvetica,Arial,sans-serif;fill:var(--text)}
+.m{fill:var(--mute)}
+.mono{font-family:"JetBrains Mono","DejaVu Sans Mono",Menlo,monospace}
+</style></head><body>
+
+<!-- 1 HERO -->
+<div class="card" id="hero" style="height:700px">
+<svg width="1400" height="700" viewBox="0 0 1400 700">
+ <defs>
+  <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2dd4bf"/><stop offset="1" stop-color="#60a5fa"/></linearGradient>
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#15223a" stroke-width="1"/></pattern>
+ </defs>
+ <rect width="1400" height="700" fill="url(#grid)"/>
+ <text x="70" y="110" font-size="24" font-weight="600" style="fill:#2dd4bf;letter-spacing:3px">SOC INCIDENT RESPONSE PIPELINE</text>
+ <text x="70" y="195" font-size="52" font-weight="800">Grading the scorer,</text>
+ <text x="70" y="268" font-size="52" font-weight="800" style="fill:#2dd4bf">not just trusting it.</text>
+ <text x="70" y="330" font-size="23" class="m">No new commits this week. So this is the harness that checks</text>
+ <text x="70" y="364" font-size="23" class="m">whether 40 lines of arithmetic actually triage alerts correctly.</text>
+
+ <g font-size="18" font-weight="700">
+  <rect x="70" y="420" width="220" height="56" rx="28" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="2"/>
+  <circle cx="98" cy="448" r="7" fill="#2dd4bf"/>
+  <text x="118" y="455">9 / 11 exact</text>
+
+  <rect x="306" y="420" width="260" height="56" rx="28" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="2"/>
+  <circle cx="334" cy="448" r="7" fill="#2dd4bf"/>
+  <text x="354" y="455">0 under-triaged</text>
+
+  <rect x="582" y="420" width="230" height="56" rx="28" fill="#2a2208" stroke="#fbbf24" stroke-width="2"/>
+  <circle cx="610" cy="448" r="7" fill="#fbbf24"/>
+  <text x="630" y="455">1 over-triaged</text>
+ </g>
+
+ <path d="M1180 170 L1270 200 L1270 300 C1270 350 1235 380 1180 400 C1125 380 1090 350 1090 300 L1090 200 Z" fill="#111b30" stroke="url(#g1)" stroke-width="5"/>
+ <path d="M1140 280 L1170 312 L1230 240" stroke="#2dd4bf" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+ <text x="1180" y="440" font-size="18" text-anchor="middle" class="m">33 tests passing</text>
+
+ <g font-size="19" font-weight="600" text-anchor="middle">
+  <rect x="1005" y="480" width="170" height="46" rx="23" fill="#111b30" stroke="#26364f"/><text x="1090" y="509">Splunk</text>
+  <rect x="1195" y="480" width="170" height="46" rx="23" fill="#111b30" stroke="#26364f"/><text x="1280" y="509">Jira</text>
+  <rect x="1005" y="536" width="170" height="46" rx="23" fill="#111b30" stroke="#26364f"/><text x="1090" y="565">VirusTotal</text>
+  <rect x="1195" y="536" width="170" height="46" rx="23" fill="#111b30" stroke="#26364f"/><text x="1280" y="565">AbuseIPDB</text>
+ </g>
+ <text x="70" y="650" font-size="19" class="m">github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline</text>
+</svg></div>
+
+<!-- 2 SCORING FLOW -->
+<div class="card" id="flow" style="height:660px">
+<svg width="1400" height="660" viewBox="0 0 1400 660">
+ <defs><marker id="af" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#26364f"/></marker>
+ <marker id="ar" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f87171"/></marker></defs>
+ <text x="60" y="64" font-size="32" font-weight="800">score_alert(), the real formula</text>
+ <text x="60" y="98" font-size="20" class="m">src/socpipeline/scoring.py &#8212; two signals in, one severity out, additive and capped at 100</text>
+
+ <!-- VT box -->
+ <rect x="60" y="150" width="340" height="150" rx="14" fill="#111b30" stroke="#60a5fa" stroke-width="2.5"/>
+ <text x="86" y="190" font-size="20" font-weight="700" style="fill:#60a5fa">VirusTotal</text>
+ <text x="86" y="222" font-size="17" class="m">malicious &#215; 6, capped at 60</text>
+ <text x="86" y="250" font-size="17" class="m">suspicious &#215; 2, capped at 10</text>
+ <text x="86" y="278" font-size="15" class="m">10 engines and 70 engines: same 60</text>
+
+ <!-- Abuse box -->
+ <rect x="60" y="330" width="340" height="150" rx="14" fill="#111b30" stroke="#60a5fa" stroke-width="2.5"/>
+ <text x="86" y="370" font-size="20" font-weight="700" style="fill:#60a5fa">AbuseIPDB</text>
+ <text x="86" y="402" font-size="17" class="m">abuse_confidence_score &#215; 0.5</text>
+ <text x="86" y="430" font-size="17" class="m">+10 flat if known Tor exit node</text>
+ <text x="86" y="458" font-size="15" class="m">event count is not read anywhere</text>
+
+ <line x1="400" y1="225" x2="490" y2="300" stroke="#26364f" stroke-width="3" marker-end="url(#af)"/>
+ <line x1="400" y1="405" x2="490" y2="320" stroke="#26364f" stroke-width="3" marker-end="url(#af)"/>
+
+ <!-- sum -->
+ <circle cx="520" cy="310" r="46" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="3"/>
+ <text x="520" y="302" font-size="26" text-anchor="middle" font-weight="800">+</text>
+ <text x="520" y="330" font-size="13" text-anchor="middle" class="m">cap 100</text>
+
+ <line x1="566" y1="310" x2="660" y2="310" stroke="#26364f" stroke-width="3" marker-end="url(#af)"/>
+
+ <!-- severity ladder -->
+ <g font-size="17" font-weight="700">
+  <rect x="670" y="150" width="280" height="50" rx="10" fill="#111b30" stroke="#26364f"/><text x="694" y="182">0&#8201;&#8212;&#8201;39&nbsp; LOW / INFO</text>
+  <rect x="670" y="210" width="280" height="50" rx="10" fill="#111b30" stroke="#fbbf24"/><text x="694" y="242" style="fill:#fbbf24">40&#8201;&#8212;&#8201;59&nbsp; MEDIUM</text>
+  <rect x="670" y="270" width="280" height="50" rx="10" fill="#111b30" stroke="#fb923c"/><text x="694" y="302" style="fill:#fb923c">60&#8201;&#8212;&#8201;79&nbsp; HIGH</text>
+  <rect x="670" y="330" width="280" height="50" rx="10" fill="#111b30" stroke="#f87171"/><text x="694" y="362" style="fill:#f87171">80&#8201;&#8212;&#8201;100 CRITICAL</text>
+ </g>
+
+ <line x1="950" y1="250" x2="1040" y2="300" stroke="#26364f" stroke-width="3" marker-end="url(#af)"/>
+ <line x1="950" y1="330" x2="1040" y2="320" stroke="#26364f" stroke-width="3" marker-end="url(#af)"/>
+
+ <rect x="1050" y="250" width="290" height="140" rx="14" fill="#111b30" stroke="#26364f" stroke-width="2.5"/>
+ <text x="1076" y="292" font-size="19" font-weight="700">score &#8805; 40 ?</text>
+ <text x="1076" y="322" font-size="16" class="m">yes &#8594; Jira ticket, priority</text>
+ <text x="1076" y="346" font-size="16" class="m">from the severity mapping</text>
+ <text x="1076" y="370" font-size="16" class="m">no &#8594; logged only, no ticket</text>
+
+ <line x1="520" y1="356" x2="520" y2="500" stroke="#f87171" stroke-width="3" stroke-dasharray="6 5" marker-end="url(#ar)"/>
+ <rect x="330" y="500" width="500" height="100" rx="14" fill="#2a1414" stroke="#f87171" stroke-width="2.5"/>
+ <text x="356" y="536" font-size="19" font-weight="700" style="fill:#f87171">lookup errored (429 / timeout / no key)</text>
+ <text x="356" y="566" font-size="17" class="m">fails closed: ticket at Medium regardless of score</text>
+
+ <text x="60" y="635" font-size="17" class="m">The red path is the one branch this pipeline refuses to let a quiet failure skip.</text>
+</svg></div>
+
+<!-- 3 CALIBRATION -->
+<div class="card" id="calibration" style="height:660px">
+<svg width="1400" height="660" viewBox="0 0 1400 660">
+ <text x="60" y="70" font-size="34" font-weight="800">The rubric, measured against eleven cases</text>
+ <text x="60" y="108" font-size="21" class="m">python cli.py --calibrate examples/calibration_corpus.json &#8212; real output, run just now</text>
+ <text x="530" y="160" font-size="19" text-anchor="middle" class="m">predicted</text>
+ <text x="60" y="360" font-size="19" class="m" transform="rotate(-90 60 360)">expected</text>
+ <g id="mx"></g>
+ <g font-size="21">
+  <rect x="940" y="190" width="400" height="110" rx="14" fill="#111b30" stroke="#26364f"/>
+  <text x="966" y="232" class="m" font-size="18">Exact severity accuracy</text><text x="966" y="278" font-size="40" font-weight="800">9 of 11</text>
+  <rect x="940" y="320" width="400" height="110" rx="14" fill="#0f2a2a" stroke="#2dd4bf"/>
+  <text x="966" y="362" class="m" font-size="18">Under-triaged (the number that matters)</text><text x="966" y="408" font-size="40" font-weight="800" style="fill:#2dd4bf">0</text>
+  <rect x="940" y="450" width="400" height="110" rx="14" fill="#2a2208" stroke="#fbbf24"/>
+  <text x="966" y="492" class="m" font-size="18">Over-triaged, by design</text><text x="966" y="536" font-size="40" font-weight="800" style="fill:#fbbf24">1</text><text x="1030" y="536" font-size="18" class="m">packer-false-positive</text>
+ </g>
+ <text x="60" y="600" font-size="17" class="m">Both misses are known gaps written into the corpus on purpose, not surprises.</text>
+ <text x="60" y="628" font-size="16" class="m">brute-force-burst-tor: expected HIGH, scored MEDIUM (no behavioural axis)</text>
+</svg></div>
+
+<!-- 4 REDACTION / FAIL-CLOSED DEMO -->
+<div class="card" id="redaction" style="height:560px">
+<svg width="1400" height="560" viewBox="0 0 1400 560">
+ <text x="60" y="68" font-size="32" font-weight="800">Real terminal output, this run, no API keys set</text>
+ <text x="60" y="102" font-size="19" class="m">python cli.py --dry-run --redact &#8212; fail-closed and pseudonymisation together</text>
+
+ <rect x="60" y="140" width="1280" height="340" rx="14" fill="#070b14" stroke="#26364f" stroke-width="2"/>
+ <g class="mono" font-size="19">
+  <text x="90" y="182" style="fill:#fbbf24">REDACT_SALT not set: tokens are random per run and will not match across runs</text>
+  <text x="90" y="222" class="m">Rule:&#160;&#160;&#160;&#160;&#160;&#160;Suspicious Outbound Connection Following Malicious File Write</text>
+  <text x="90" y="254">Host/User: <tspan style="fill:#60a5fa">host-95b87abdca</tspan> / <tspan style="fill:#60a5fa">user-c6ca890125</tspan></text>
+  <text x="90" y="294" font-weight="700">Score:&#160;&#160;&#160;&#160;&#160;0/100&#160;&#160;(INFO)</text>
+  <text x="90" y="330" style="fill:#f87171">! Enrichment incomplete: VT_API_KEY and ABUSEIPDB_API_KEY not configured</text>
+  <text x="90" y="366" style="fill:#f87171">! Treat the score as a lower bound, not a clean verdict</text>
+  <text x="90" y="412" font-weight="700" style="fill:#2dd4bf">[dry-run] Would create Jira ticket: [INFO, ENRICHMENT FAILED]</text>
+  <text x="90" y="444" class="m">Real host/user strings never appear above &#8212; only salted HMAC tokens do.</text>
+ </g>
+ <text x="60" y="530" font-size="17" class="m">An INFO score here still tickets, because a missing key is not evidence the alert is clean.</text>
+</svg></div>
+
+<script>
+const labels=["INFO","LOW","MEDIUM","HIGH","CRITICAL"];
+const M=[[4,0,0,0,0],[0,2,0,1,0],[0,0,1,0,0],[0,0,1,1,0],[0,0,0,0,1]];
+const g=document.getElementById('mx');const NS="http://www.w3.org/2000/svg";
+const x0=210,y0=210,w=128,h=72;
+function t(x,y,s,o={}){const e=document.createElementNS(NS,'text');e.setAttribute('x',x);e.setAttribute('y',y);e.setAttribute('text-anchor',o.a||'middle');e.setAttribute('font-size',o.f||22);e.setAttribute('font-weight',o.w||600);if(o.c)e.style.fill=o.c;e.textContent=s;g.appendChild(e);}
+labels.forEach((l,i)=>{t(x0+i*w+w/2-0,190,l,{f:16,c:'#93a3bb'});t(x0-14,y0+i*h+h/2+7,l,{a:'end',f:16,c:'#93a3bb'});});
+M.forEach((r,i)=>r.forEach((v,j)=>{const rc=document.createElementNS(NS,'rect');rc.setAttribute('x',x0+j*w+3);rc.setAttribute('y',y0+i*h+3);rc.setAttribute('width',w-6);rc.setAttribute('height',h-6);rc.setAttribute('rx',8);
+ let fill='#111b30',stroke='#1c2a42';
+ if(v>0&&i===j){fill='#0f3a36';stroke='#2dd4bf'}else if(v>0){fill='#4a2a0c';stroke='#fbbf24'}
+ rc.setAttribute('fill',fill);rc.setAttribute('stroke',stroke);g.appendChild(rc);
+ t(x0+j*w+w/2,y0+i*h+h/2+9,v===0?'·':String(v),{f:v?30:24,w:800,c:v?'#e8edf5':'#3b4a63'});}));
+</script>
+</body></html>
