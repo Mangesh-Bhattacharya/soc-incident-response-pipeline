@@ -1,0 +1,184 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+:root{--bg:#0b1220;--panel:#111b30;--line:#26364f;--text:#e8edf5;--mute:#93a3bb;--teal:#2dd4bf;--blue:#60a5fa;--red:#f87171;--amber:#fbbf24;--green:#4ade80}
+*{box-sizing:border-box;margin:0}
+body{background:#05080f;font-family:"Inter","Segoe UI",Helvetica,Arial,sans-serif;color:var(--text)}
+.card{width:1400px;background:var(--bg);position:relative;overflow:hidden;margin-bottom:40px}
+svg{display:block}
+text{font-family:"Inter","Segoe UI",Helvetica,Arial,sans-serif;fill:var(--text)}
+.m{fill:var(--mute)}
+.mono{font-family:"JetBrains Mono","DejaVu Sans Mono",Menlo,monospace}
+</style></head><body>
+
+<!-- 1 HERO -->
+<div class="card" id="hero" style="height:700px">
+<svg width="1400" height="700" viewBox="0 0 1400 700">
+ <defs>
+  <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2dd4bf"/><stop offset="1" stop-color="#60a5fa"/></linearGradient>
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#15223a" stroke-width="1"/></pattern>
+ </defs>
+ <rect width="1400" height="700" fill="url(#grid)"/>
+ <text x="70" y="110" font-size="24" font-weight="600" style="fill:#2dd4bf;letter-spacing:3px">SOC INCIDENT RESPONSE PIPELINE</text>
+ <text x="70" y="195" font-size="50" font-weight="800">The week nothing shipped</text>
+ <text x="70" y="268" font-size="50" font-weight="800" style="fill:#2dd4bf">(on purpose).</text>
+ <text x="70" y="330" font-size="23" class="m">Zero human commits in 7 days. Ten automated dependency PRs.</text>
+ <text x="70" y="364" font-size="23" class="m">Here's the machinery that makes that a safe thing to say.</text>
+
+ <g font-size="18" font-weight="700">
+  <rect x="70" y="420" width="230" height="56" rx="28" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="2"/>
+  <circle cx="98" cy="448" r="7" fill="#2dd4bf"/>
+  <text x="118" y="455">33 / 33 tests pass</text>
+
+  <rect x="316" y="420" width="240" height="56" rx="28" fill="#111b30" stroke="#60a5fa" stroke-width="2"/>
+  <circle cx="344" cy="448" r="7" fill="#60a5fa"/>
+  <text x="364" y="455">10 dependabot PRs</text>
+
+  <rect x="572" y="420" width="260" height="56" rx="28" fill="#2a2208" stroke="#fbbf24" stroke-width="2"/>
+  <circle cx="600" cy="448" r="7" fill="#fbbf24"/>
+  <text x="620" y="455">4 superseded today</text>
+ </g>
+
+ <path d="M1180 170 L1270 200 L1270 300 C1270 350 1235 380 1180 400 C1125 380 1090 350 1090 300 L1090 200 Z" fill="#111b30" stroke="url(#g1)" stroke-width="5"/>
+ <path d="M1140 280 L1170 312 L1230 240" stroke="#2dd4bf" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+ <text x="1180" y="440" font-size="18" text-anchor="middle" class="m">ruff: all checks passed</text>
+
+ <g font-size="19" font-weight="600" text-anchor="middle">
+  <rect x="1005" y="480" width="170" height="46" rx="23" fill="#111b30" stroke="#26364f"/><text x="1090" y="509">pip</text>
+  <rect x="1195" y="480" width="170" height="46" rx="23" fill="#111b30" stroke="#26364f"/><text x="1280" y="509">npm</text>
+  <rect x="1005" y="536" width="170" height="46" rx="23" fill="#111b30" stroke="#26364f"/><text x="1090" y="565">docker</text>
+  <rect x="1195" y="536" width="170" height="46" rx="23" fill="#111b30" stroke="#26364f"/><text x="1280" y="565">actions</text>
+ </g>
+ <text x="70" y="650" font-size="19" class="m">github.com/Mangesh-Bhattacharya/soc-incident-response-pipeline</text>
+</svg></div>
+
+<!-- 2 CI GATE FLOW -->
+<div class="card" id="flow" style="height:640px">
+<svg width="1400" height="640" viewBox="0 0 1400 640">
+ <defs><marker id="af" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#26364f"/></marker>
+ <marker id="ag" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#2dd4bf"/></marker>
+ <marker id="ar" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f87171"/></marker></defs>
+ <text x="60" y="60" font-size="30" font-weight="800">Same gate for a bot PR as a human one</text>
+ <text x="60" y="94" font-size="19" class="m">.github/dependabot.yml (5 ecosystems, weekly) feeding .github/workflows/ci.yml</text>
+
+ <!-- dependabot sources -->
+ <g font-size="16" font-weight="700" text-anchor="middle">
+  <rect x="40" y="140" width="190" height="56" rx="12" fill="#111b30" stroke="#60a5fa" stroke-width="2"/><text x="135" y="174">pip (root)</text>
+  <rect x="40" y="208" width="190" height="56" rx="12" fill="#111b30" stroke="#60a5fa" stroke-width="2"/><text x="135" y="242">npm (/dashboard)</text>
+  <rect x="40" y="276" width="190" height="56" rx="12" fill="#111b30" stroke="#60a5fa" stroke-width="2"/><text x="135" y="297" font-size="14">docker (/api,</text><text x="135" y="317" font-size="14">/dashboard)</text>
+  <rect x="40" y="344" width="190" height="56" rx="12" fill="#111b30" stroke="#26364f" stroke-width="2"/><text x="135" y="372" class="m" font-weight="600">github-actions (root)</text>
+  <text x="135" y="392" font-size="12" class="m" font-weight="500">no bump needed this week</text>
+ </g>
+
+ <line x1="230" y1="168" x2="330" y2="260" stroke="#26364f" stroke-width="3" marker-end="url(#af)"/>
+ <line x1="230" y1="236" x2="330" y2="270" stroke="#26364f" stroke-width="3" marker-end="url(#af)"/>
+ <line x1="230" y1="304" x2="330" y2="280" stroke="#26364f" stroke-width="3" marker-end="url(#af)"/>
+
+ <rect x="340" y="230" width="190" height="80" rx="14" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="2.5"/>
+ <text x="435" y="264" font-size="17" font-weight="700" text-anchor="middle">opens a PR</text>
+ <text x="435" y="290" font-size="14" class="m" text-anchor="middle">10 this week, 3 ecosystems</text>
+
+ <line x1="530" y1="270" x2="620" y2="270" stroke="#26364f" stroke-width="3" marker-end="url(#af)"/>
+
+ <g font-size="16" font-weight="700" text-anchor="middle">
+  <rect x="630" y="110" width="170" height="56" rx="10" fill="#111b30" stroke="#26364f" stroke-width="2"/><text x="715" y="144">lint: ruff</text>
+  <rect x="630" y="180" width="170" height="56" rx="10" fill="#111b30" stroke="#26364f" stroke-width="2"/><text x="715" y="206" font-size="14">test: 3.10 / 3.11</text><text x="715" y="224" font-size="14">/ 3.12 (33 tests)</text>
+  <rect x="630" y="250" width="170" height="56" rx="10" fill="#111b30" stroke="#26364f" stroke-width="2"/><text x="715" y="284">dashboard build</text>
+  <rect x="630" y="320" width="170" height="56" rx="10" fill="#111b30" stroke="#26364f" stroke-width="2"/><text x="715" y="346" font-size="14">docker: boot stack,</text><text x="715" y="364" font-size="14">curl the port</text>
+ </g>
+
+ <line x1="800" y1="138" x2="900" y2="250" stroke="#26364f" stroke-width="3" marker-end="url(#af)"/>
+ <line x1="800" y1="208" x2="900" y2="260" stroke="#26364f" stroke-width="3" marker-end="url(#af)"/>
+ <line x1="800" y1="278" x2="900" y2="270" stroke="#26364f" stroke-width="3" marker-end="url(#af)"/>
+ <line x1="800" y1="348" x2="900" y2="280" stroke="#26364f" stroke-width="3" marker-end="url(#af)"/>
+
+ <rect x="910" y="220" width="220" height="100" rx="14" fill="#111b30" stroke="#26364f" stroke-width="2.5"/>
+ <text x="1020" y="256" font-size="18" font-weight="700" text-anchor="middle">all green?</text>
+ <text x="1020" y="282" font-size="14" class="m" text-anchor="middle">same checks for every PR,</text>
+ <text x="1020" y="300" font-size="14" class="m" text-anchor="middle">bot-authored or not</text>
+
+ <line x1="1130" y1="250" x2="1230" y2="200" stroke="#2dd4bf" stroke-width="3" marker-end="url(#ag)"/>
+ <line x1="1130" y1="290" x2="1230" y2="340" stroke="#f87171" stroke-width="3" marker-end="url(#ar)"/>
+
+ <rect x="1240" y="160" width="130" height="70" rx="12" fill="#0f2a2a" stroke="#2dd4bf" stroke-width="2.5"/>
+ <text x="1305" y="202" font-size="16" font-weight="700" text-anchor="middle" style="fill:#2dd4bf">mergeable</text>
+ <rect x="1240" y="310" width="130" height="70" rx="12" fill="#2a1414" stroke="#f87171" stroke-width="2.5"/>
+ <text x="1305" y="345" font-size="15" font-weight="700" text-anchor="middle" style="fill:#f87171">stays open,</text>
+ <text x="1305" y="365" font-size="15" font-weight="700" text-anchor="middle" style="fill:#f87171">flagged</text>
+
+ <!-- scheduled path -->
+ <rect x="40" y="460" width="1330" height="140" rx="14" fill="#111b30" stroke="#26364f" stroke-width="2"/>
+ <text x="66" y="500" font-size="19" font-weight="700">Separate path: schedule: in ci.yml runs the full suite monthly, zero commits required</text>
+ <text x="66" y="530" font-size="16" class="m">Catches drift no diff here would trigger: an upstream API shape change, a floating base image tag moving.</text>
+ <line x1="950" y1="515" x2="1040" y2="515" stroke="#f87171" stroke-width="3" stroke-dasharray="6 5" marker-end="url(#ar)"/>
+ <rect x="1050" y="480" width="300" height="80" rx="12" fill="#2a1414" stroke="#f87171" stroke-width="2.5"/>
+ <text x="1200" y="512" font-size="15" font-weight="700" text-anchor="middle" style="fill:#f87171">on failure only:</text>
+ <text x="1200" y="536" font-size="14" text-anchor="middle" class="m">auto-files a "scheduled-ci-failure" issue</text>
+
+ <text x="60" y="625" font-size="16" class="m">A scheduled run has nobody watching it by default, so a silent failure there is worse than a noisy one.</text>
+</svg></div>
+
+<!-- 3 SUPERSEDE TIMELINE -->
+<div class="card" id="timeline" style="height:620px">
+<svg width="1400" height="620" viewBox="0 0 1400 620">
+ <text x="60" y="64" font-size="30" font-weight="800">Last week's PRs, superseded before anyone merged them</text>
+ <text x="60" y="98" font-size="18" class="m">Dependabot's own weekly re-scan closed 4 of 5, each replaced by a PR for a newer version of the same dependency</text>
+
+ <text x="130" y="140" font-size="15" class="m" text-anchor="middle">opened 2026-11-15</text>
+ <text x="730" y="140" font-size="15" class="m" text-anchor="middle">closed / opened 2026-11-22 (today)</text>
+
+ <g font-size="16" font-weight="600">
+  <!-- row 1: ruff -->
+  <rect x="40" y="170" width="300" height="56" rx="10" fill="#111b30" stroke="#26364f"/><text x="60" y="203">#74 ruff &gt;=0.16.7 &#8594; 0.17.5</text>
+  <line x1="340" y1="198" x2="470" y2="198" stroke="#f87171" stroke-width="3" stroke-dasharray="6 5" marker-end="url(#ar)"/>
+  <text x="405" y="188" font-size="13" text-anchor="middle" style="fill:#f87171">closed</text>
+  <rect x="480" y="170" width="300" height="56" rx="10" fill="#0f2a2a" stroke="#2dd4bf"/><text x="500" y="203">#80 ruff &gt;=0.16.7 &#8594; 0.17.6</text>
+
+  <!-- row 2: fastapi -->
+  <rect x="40" y="246" width="300" height="56" rx="10" fill="#111b30" stroke="#26364f"/><text x="60" y="279">#75 fastapi &gt;=0.110 &#8594; 0.162.5</text>
+  <line x1="340" y1="274" x2="470" y2="274" stroke="#f87171" stroke-width="3" stroke-dasharray="6 5" marker-end="url(#ar)"/>
+  <text x="405" y="264" font-size="13" text-anchor="middle" style="fill:#f87171">closed</text>
+  <rect x="480" y="246" width="300" height="56" rx="10" fill="#0f2a2a" stroke="#2dd4bf"/><text x="500" y="279">#82 fastapi &gt;=0.110 &#8594; 0.165.0</text>
+
+  <!-- row 3: framer-motion -->
+  <rect x="40" y="322" width="300" height="56" rx="10" fill="#111b30" stroke="#26364f"/><text x="60" y="355">#76 framer-motion &#8594; 14.13.0</text>
+  <line x1="340" y1="350" x2="470" y2="350" stroke="#f87171" stroke-width="3" stroke-dasharray="6 5" marker-end="url(#ar)"/>
+  <text x="405" y="340" font-size="13" text-anchor="middle" style="fill:#f87171">closed</text>
+  <rect x="480" y="322" width="300" height="56" rx="10" fill="#0f2a2a" stroke="#2dd4bf"/><text x="500" y="355">#83 framer-motion &#8594; 14.14.0</text>
+
+  <!-- row 4: oxlint -->
+  <rect x="40" y="398" width="300" height="56" rx="10" fill="#111b30" stroke="#26364f"/><text x="60" y="431">#77 oxlint 1.82.0 &#8594; 1.93.0</text>
+  <line x1="340" y1="426" x2="470" y2="426" stroke="#f87171" stroke-width="3" stroke-dasharray="6 5" marker-end="url(#ar)"/>
+  <text x="405" y="416" font-size="13" text-anchor="middle" style="fill:#f87171">closed</text>
+  <rect x="480" y="398" width="300" height="56" rx="10" fill="#0f2a2a" stroke="#2dd4bf"/><text x="500" y="431">#81 oxlint 1.82.0 &#8594; 1.94.0</text>
+
+  <!-- row 5: vitejs plugin react, unchanged -->
+  <rect x="40" y="474" width="340" height="56" rx="10" fill="#111b30" stroke="#fbbf24" stroke-width="2"/><text x="60" y="507" font-size="15">#78 vitejs/plugin-react &#8594; 6.3.0</text>
+  <text x="440" y="505" font-size="14" text-anchor="middle" class="m" font-weight="500">still open &#8212; no newer release yet</text>
+ </g>
+
+ <rect x="900" y="170" width="460" height="56" rx="10" fill="#0a1424" stroke="#60a5fa" stroke-width="2"/>
+ <text x="920" y="203" font-size="15" class="m">+ #79 docker python base image (/api) -- new</text>
+ <text x="60" y="580" font-size="17" class="m">Plus PR #79, new today: the /api base image, 3.12.7-slim-bookworm &#8594; 3.15.2-slim-bookworm.</text>
+</svg></div>
+
+<!-- 4 TERMINAL -->
+<div class="card" id="terminal" style="height:480px">
+<svg width="1400" height="480" viewBox="0 0 1400 480">
+ <text x="60" y="64" font-size="30" font-weight="800">The gate itself, run just now against main</text>
+ <text x="60" y="98" font-size="18" class="m">HEAD d4df8bf, unchanged since 2026-10-16 -- real ruff and pytest output</text>
+
+ <rect x="60" y="130" width="1280" height="300" rx="14" fill="#070b14" stroke="#26364f" stroke-width="2"/>
+ <g class="mono" font-size="19">
+  <text x="90" y="172" style="fill:#60a5fa">$ ruff check .</text>
+  <text x="90" y="204" style="fill:#2dd4bf" font-weight="700">All checks passed!</text>
+  <text x="90" y="252" style="fill:#60a5fa">$ pytest tests/ -v</text>
+  <text x="90" y="284" class="m">tests/test_scoring.py .......... tests/test_pipeline.py ....</text>
+  <text x="90" y="312" class="m">tests/test_redact.py ...... tests/test_calibration.py ....</text>
+  <text x="90" y="352" font-weight="700" style="fill:#2dd4bf">33 passed, 1 warning in 0.95s</text>
+  <text x="90" y="392" class="m" font-size="16">(the warning: starlette.testclient's own httpx deprecation notice, unrelated to this repo)</text>
+ </g>
+ <text x="60" y="460" font-size="17" class="m">Every one of this week's 10 Dependabot PRs has to clear this same gate before it can merge.</text>
+</svg></div>
+
+</body></html>
